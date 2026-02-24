@@ -1,0 +1,155 @@
+/* App Shell — Red Noir Bloomberg */
+.app {
+  min-height: 100vh;
+  position: relative;
+  background: var(--bg-void);
+}
+
+/* Global background — starfield + red glow */
+.app-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.app-bg-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, #0a0205, #000);
+}
+.app-bg-stars1 {
+  position: absolute;
+  top: 0; left: 0;
+  width: 1px; height: 1px;
+  background: transparent;
+  box-shadow: 234px 124px #fff, 654px 345px #fff, 876px 12px #fff, 1200px 800px #fff,
+    400px 1500px #fff, 1800px 200px #fff, 100px 1000px #fff, 900px 1900px #fff,
+    500px 600px #fff, 1400px 100px #fff, 300px 400px #fff, 1600px 1200px #fff,
+    50px 300px #fff, 780px 520px #fff, 1100px 1400px #fff;
+  animation: animStar 50s linear infinite;
+}
+.app-bg-stars2 {
+  position: absolute;
+  top: 0; left: 0;
+  width: 2px; height: 2px;
+  background: transparent;
+  box-shadow: 123px 456px #fff, 789px 234px #fff, 456px 890px #fff, 1100px 300px #fff,
+    200px 1200px #fff, 1500px 500px #fff, 600px 1700px #fff, 1300px 900px #fff;
+  animation: animStar 80s linear infinite;
+}
+.app-bg-glow {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 800px; height: 800px;
+  background: radial-gradient(circle, rgba(239, 35, 60, 0.04), transparent 70%);
+  border-radius: 50%;
+  filter: blur(80px);
+}
+.app-bg-grid {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 50px 50px;
+  mask-image: radial-gradient(circle at center, black 30%, transparent 70%);
+  -webkit-mask-image: radial-gradient(circle at center, black 30%, transparent 70%);
+}
+
+/* Noise overlay */
+.app-noise {
+  position: fixed;
+  inset: 0;
+  opacity: 0.02;
+  pointer-events: none;
+  z-index: 9999;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Gradient blur header background */
+.app-header-blur {
+  position: fixed;
+  z-index: 40;
+  inset: 0 0 auto 0;
+  height: 140px;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.85), transparent);
+  backdrop-filter: blur(8px);
+  mask-image: linear-gradient(to bottom, black, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, black, transparent);
+}
+
+/* Main content */
+.app-main {
+  position: relative;
+  z-index: 10;
+}
+
+/* Section container */
+.section {
+  padding: 0 clamp(16px, 4vw, 64px);
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.section-gap {
+  padding-top: 96px;
+  padding-bottom: 96px;
+}
+
+/* Section header */
+.section-header {
+  margin-bottom: 48px;
+}
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--red-accent);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-label::before {
+  content: '';
+  width: 20px;
+  height: 1px;
+  background: var(--red-accent);
+}
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(32px, 4vw, 52px);
+  font-weight: 700;
+  color: var(--text-bright);
+  line-height: 1.1;
+  letter-spacing: -1px;
+}
+.section-title .accent {
+  color: var(--red-accent);
+}
+.section-subtitle {
+  font-size: 15px;
+  color: var(--text-secondary);
+  margin-top: 12px;
+  max-width: 560px;
+  font-weight: 400;
+  line-height: 1.7;
+}
+
+/* Divider */
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-secondary), transparent);
+  margin: 0 clamp(16px, 4vw, 64px);
+}
+
+/* Full-bleed red banner */
+.red-banner {
+  background: var(--red-accent);
+  padding: 20px 0;
+  text-align: center;
+}

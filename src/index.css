@@ -1,0 +1,82 @@
+/* ========================================
+   THE AGENTS OF WALL STREET
+   Red Noir × Bloomberg Terminal
+   ======================================== */
+
+:root {
+  --bg-void: #000000;
+  --bg-primary: #050507;
+  --bg-secondary: #0a0a0e;
+  --bg-tertiary: #0f1014;
+  --bg-card: #0c0c10;
+  --bg-card-hover: #111118;
+  --bg-elevated: #161620;
+
+  --border-primary: #151520;
+  --border-secondary: #1e1e2e;
+  --border-accent: rgba(239, 35, 60, 0.2);
+  --border-red: #ef233c;
+
+  --text-primary: #e0ddd8;
+  --text-secondary: #6b6a7a;
+  --text-tertiary: #3e3d4d;
+  --text-accent: #ef233c;
+  --text-bright: #ffffff;
+
+  --red-accent: #ef233c;
+  --red-light: #ff3a52;
+  --red-dim: rgba(239, 35, 60, 0.15);
+  --red-glow: rgba(239, 35, 60, 0.08);
+  --red-ultra-dim: rgba(239, 35, 60, 0.04);
+
+  --green: #00dc82;
+  --green-dim: rgba(0, 220, 130, 0.12);
+  --loss-red: #ff4757;
+  --loss-red-dim: rgba(255, 71, 87, 0.12);
+  --blue: #4a9eff;
+  --gold: #c9a44e;
+
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body: 'Manrope', -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-void);
+  color: var(--text-primary);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+#root { max-width: 100%; margin: 0; padding: 0; text-align: left; }
+
+::selection { background: var(--red-accent); color: white; }
+
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: var(--bg-secondary); }
+::-webkit-scrollbar-thumb { background: var(--border-secondary); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--red-dim); }
+
+a { color: var(--red-accent); text-decoration: none; transition: color 0.2s; }
+a:hover { color: var(--red-light); }
+
+@keyframes tickerScroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes animStar { from { transform: translateY(0px); } to { transform: translateY(-2000px); } }
+@keyframes scanline { 0% { top: -10%; } 100% { top: 110%; } }
+
+@property --gradient-angle { syntax: "<angle>"; initial-value: 0deg; inherits: false; }

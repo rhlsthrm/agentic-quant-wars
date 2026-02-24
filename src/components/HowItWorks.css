@@ -1,0 +1,103 @@
+.hiw-section { position: relative; }
+
+.hiw-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+  margin-bottom: 40px;
+}
+
+.hiw-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: 12px;
+  padding: 24px 22px;
+  position: relative;
+  transition: all 0.3s var(--ease-out);
+}
+.hiw-card:hover {
+  border-color: var(--border-secondary);
+  transform: translateY(-3px);
+}
+
+.hiw-number {
+  font-family: var(--font-mono);
+  font-size: 9px; font-weight: 700;
+  color: var(--text-tertiary);
+  letter-spacing: 1px;
+  margin-bottom: 14px;
+}
+
+.hiw-icon {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 14px;
+}
+
+.hiw-title {
+  font-family: var(--font-body);
+  font-size: 16px; font-weight: 700;
+  color: var(--text-bright);
+  margin-bottom: 6px;
+}
+
+.hiw-desc {
+  font-size: 12px; color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: 14px;
+  font-weight: 400;
+}
+
+.hiw-tech {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 9px; font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 3px 9px;
+  border: 1px solid;
+  border-radius: 4px;
+}
+
+/* Flow diagram */
+.hiw-flow {
+  position: relative;
+  padding: 22px 28px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.hiw-flow-line {
+  position: absolute;
+  top: 50%; left: 28px; right: 28px;
+  height: 1px;
+  background: linear-gradient(90deg, var(--border-secondary), var(--red-dim), var(--border-secondary));
+}
+.hiw-flow-items {
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  gap: 10px; flex-wrap: wrap;
+}
+.hiw-flow-node {
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px; font-weight: 700;
+  color: var(--text-primary);
+  padding: 7px 14px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-secondary);
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+}
+.hiw-flow-red {
+  color: var(--red-accent);
+  border-color: var(--border-accent);
+  background: var(--red-ultra-dim);
+}
+.hiw-flow-arrow { color: var(--text-tertiary); font-size: 14px; }
+
+@media (max-width: 768px) {
+  .hiw-grid { grid-template-columns: 1fr; }
+  .hiw-flow-items { flex-wrap: wrap; gap: 6px; }
+}

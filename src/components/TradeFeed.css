@@ -1,0 +1,80 @@
+.feed-section { position: relative; }
+
+.feed-container {
+  border: 1px solid var(--border-primary);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--bg-card);
+}
+
+.feed-live-bar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 20px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-primary);
+  font-family: var(--font-mono);
+  font-size: 9px; font-weight: 700; letter-spacing: 2px; color: var(--red-accent);
+}
+.feed-dot-pulse {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--green);
+  animation: pulse 2s ease-in-out infinite;
+  margin-left: auto;
+}
+
+.feed-list {
+  max-height: 460px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.feed-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 9px 20px;
+  border-bottom: 1px solid var(--border-primary);
+  font-family: var(--font-mono); font-size: 11px;
+  transition: background 0.15s;
+  overflow: hidden;
+}
+.feed-item:hover { background: var(--bg-card-hover); }
+.feed-item.buy { border-left: 2px solid var(--green); }
+.feed-item.sell { border-left: 2px solid var(--loss-red); }
+
+.fi-time { min-width: 36px; }
+.fi-hour { color: var(--text-tertiary); font-size: 9px; font-weight: 500; }
+.fi-agent-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+.fi-type-badge {
+  display: flex; align-items: center; gap: 3px;
+  padding: 2px 7px; border-radius: 3px;
+  font-size: 9px; font-weight: 700; letter-spacing: 0.5px;
+  min-width: 50px; justify-content: center;
+}
+.buy .fi-type-badge { background: var(--green-dim); color: var(--green); }
+.sell .fi-type-badge { background: var(--loss-red-dim); color: var(--loss-red); }
+
+.fi-details { display: flex; align-items: center; gap: 4px; flex: 1; }
+.fi-shares { color: var(--text-primary); font-weight: 500; }
+.fi-symbol { color: var(--text-bright); font-weight: 700; }
+.fi-at { color: var(--text-tertiary); }
+.fi-price { color: var(--text-secondary); }
+
+.fi-value { min-width: 80px; text-align: right; color: var(--text-secondary); font-size: 10px; }
+.fi-agent-name { min-width: 100px; text-align: right; color: var(--text-tertiary); font-size: 9px; font-weight: 500; }
+
+.feed-stats {
+  display: flex; flex-wrap: wrap; gap: 18px;
+  padding: 12px 20px;
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-primary);
+}
+.feed-stat { display: flex; align-items: center; gap: 6px; }
+.fs-dot { width: 5px; height: 5px; border-radius: 50%; }
+.fs-name { font-family: var(--font-mono); font-size: 9px; font-weight: 700; color: var(--text-secondary); }
+.fs-count { font-family: var(--font-mono); font-size: 9px; color: var(--text-tertiary); }
+
+@media (max-width: 768px) {
+  .feed-item { flex-wrap: wrap; gap: 8px; padding: 9px 12px; }
+  .fi-value, .fi-agent-name { display: none; }
+}
