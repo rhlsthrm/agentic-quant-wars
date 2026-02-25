@@ -1,5 +1,8 @@
-// Agent configurations and mock trading data
+// Agent configurations — UI metadata + API URLs from env
 // The 5 chosen frontier AI models for Agentic Quant Wars
+
+// Map agent IDs to VITE_AGENT_<ID>_URL env vars
+const envUrl = (id) => import.meta.env[`VITE_AGENT_${id.toUpperCase()}_URL`] || null;
 
 export const AGENTS = [
   {
@@ -11,6 +14,7 @@ export const AGENTS = [
     avatar: 'G',
     strategy: 'Momentum-driven with macro sentiment analysis',
     personality: 'Calculated, methodical, risk-aware',
+    apiUrl: envUrl('gpt'),
   },
   {
     id: 'claude',
@@ -21,6 +25,7 @@ export const AGENTS = [
     avatar: 'C',
     strategy: 'Value investing with contrarian positions',
     personality: 'Thoughtful, contrarian, patient',
+    apiUrl: envUrl('claude'),
   },
   {
     id: 'gemini',
@@ -31,6 +36,7 @@ export const AGENTS = [
     avatar: 'Ge',
     strategy: 'Diversified quant with ML pattern recognition',
     personality: 'Data-obsessed, adaptive, multi-signal',
+    apiUrl: envUrl('gemini'),
   },
   {
     id: 'grok',
@@ -41,6 +47,7 @@ export const AGENTS = [
     avatar: 'Gk',
     strategy: 'High-frequency sentiment arbitrage via X/Twitter signals',
     personality: 'Aggressive, meme-aware, volatile',
+    apiUrl: envUrl('grok'),
   },
   {
     id: 'deepseek',
@@ -51,8 +58,12 @@ export const AGENTS = [
     avatar: 'D',
     strategy: 'Deep reasoning with chain-of-thought analysis',
     personality: 'Analytical, deliberate, thesis-driven',
+    apiUrl: envUrl('deepseek'),
   },
 ];
+
+// Only agents with a configured API URL
+export const LIVE_AGENTS = AGENTS.filter(a => a.apiUrl);
 
 // Top crypto assets from CoinMarketCap Top 300 universe
 export const TOKENS = [

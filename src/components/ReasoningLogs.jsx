@@ -5,7 +5,9 @@ import { AGENTS } from '../data/agents';
 import './ReasoningLogs.css';
 
 export default function ReasoningLogs({ agentData }) {
-  const [activeAgent, setActiveAgent] = useState('gpt');
+  // Default to first available agent (not hardcoded 'gpt')
+  const firstAvailable = agentData ? Object.keys(agentData)[0] : AGENTS[0]?.id;
+  const [activeAgent, setActiveAgent] = useState(firstAvailable || 'gpt');
   const [visibleLogs, setVisibleLogs] = useState([]);
   const [logIndex, setLogIndex] = useState(0);
   const scrollRef = useRef(null);
@@ -53,7 +55,7 @@ export default function ReasoningLogs({ agentData }) {
 
       {/* Agent selector */}
       <div className="reasoning-agents">
-        {AGENTS.map(a => (
+        {AGENTS.filter(a => agentData?.[a.id]).map(a => (
           <button
             key={a.id}
             className={`ra-tab ${activeAgent === a.id ? 'active' : ''}`}

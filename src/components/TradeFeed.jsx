@@ -6,8 +6,8 @@ import './TradeFeed.css';
 
 export default function TradeFeed({ agentData }) {
   const [visibleTrades, setVisibleTrades] = useState([]);
-  const [tradeIndex, setTradeIndex] = useState(0);
   const feedRef = useRef(null);
+  const keyCounter = useRef(0);
 
   // Collect all trades from all agents, sorted by hour
   const allTrades = [];
@@ -30,18 +30,15 @@ export default function TradeFeed({ agentData }) {
   useEffect(() => {
     if (allTrades.length === 0) return;
 
-    // Show last 15 trades initially
-    const initial = allTrades.slice(-20).map((t, i) => ({ ...t, key: `init-${i}` }));
+    // Show last 20 trades initially, each with a unique key
+    const initial = allTrades.slice(-20).map((t) => ({ ...t, key: `t-${++keyCounter.current}` }));
     setVisibleTrades(initial);
-    setTradeIndex(allTrades.length - 20);
+    let idx = Math.max(0, allTrades.length - 20);
 
     const interval = setInterval(() => {
-      setTradeIndex(prev => {
-        const next = (prev + 1) % allTrades.length;
-        const trade = { ...allTrades[next], key: `live-${Date.now()}-${next}` };
-        setVisibleTrades(current => [...current.slice(-24), trade]);
-        return next;
-      });
+      idx = (idx + 1) % allTrades.length;
+      const trade = { ...allTrades[idx], key: `t-${++keyCounter.current}` };
+      setVisibleTrades(current => [...current.slice(-24), trade]);
     }, 2500);
 
     return () => clearInterval(interval);

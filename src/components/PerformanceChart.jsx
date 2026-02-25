@@ -7,7 +7,9 @@ import { AGENTS, STARTING_CAPITAL } from '../data/agents';
 import './PerformanceChart.css';
 
 export default function PerformanceChart({ agentData }) {
-  const [activeAgents, setActiveAgents] = useState(AGENTS.map(a => a.id));
+  const [activeAgents, setActiveAgents] = useState(() =>
+    AGENTS.filter(a => agentData?.[a.id]).map(a => a.id)
+  );
   const [chartType, setChartType] = useState('pnl'); // value | pnl | pct
 
   if (!agentData) return null;
@@ -80,7 +82,7 @@ export default function PerformanceChart({ agentData }) {
         </div>
 
         <div className="perf-agent-toggles">
-          {AGENTS.map(agent => (
+          {AGENTS.filter(a => agentData?.[a.id]).map(agent => (
             <button
               key={agent.id}
               className={`agent-toggle ${activeAgents.includes(agent.id) ? 'active' : ''}`}
