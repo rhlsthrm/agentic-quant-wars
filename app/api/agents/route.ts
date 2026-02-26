@@ -172,26 +172,14 @@ function transformAgent(
   };
 }
 
-export async function GET(): Promise<NextResponse<AgentsResponse>> {
-  const liveAgents = AGENTS.filter((a) => getAgentUrl(a.id));
+// ── In-memory cache ──────────────────────────────────────
+let cachedResponse: AgentsResponse | null = null;
+let cacheTimestamp = 0;
+const CACHE_TTL_MS = 25_000; // shorter than 30s client poll
 
-  if (liveAgents.length === 0) {
-    return NextResponse.json({
-      agentData: {},
-      tokenPrices: {},
-      rankings: [],
-      competition: null,
-      live: false,
-    });
-  }
-
-  const fetched = await Promise.all(
-    liveAgents.map(async (agent) => {
-      const data = await fetchAgent(agent);
-      return { agent, data };
-    }),
-  );
-
+function buildResponse(
+  fetched: { agent: AgentConfig; data: Awaited<ReturnType<typeof fetchAgent>> }[],
+): AgentsResponse {
   const agentData: Record<string, AgentData> = {};
   let competition: AgentsResponse['competition'] = null;
 
@@ -226,11 +214,53 @@ export async function GET(): Promise<NextResponse<AgentsResponse>> {
     }
   }
 
+  return { agentData, tokenPrices, rankings, competition, live: true };
+}
+
+export async function GET(): Promise<NextResponse<AgentsResponse>> {
+  // Serve fresh cache immediately
+  if (cachedResponse && Date.now() - cacheTimestamp < CACHE_TTL_MS) {
+    return NextResponse.json(cachedResponse);
+  }
+
+  const liveAgents = AGENTS.filter((a) => getAgentUrl(a.id));
+
+  if (liveAgents.length === 0) {
+    return NextResponse.json({
+      agentData: {},
+      tokenPrices: {},
+      rankings: [],
+      competition: null,
+      live: false,
+    });
+  }
+
+  const fetched = await Promise.all(
+    liveAgents.map(async (agent) => {
+      const data = await fetchAgent(agent);
+      return { agent, data };
+    }),
+  );
+
+  const hasAnyData = fetched.some((f) => f.data !== null);
+
+  if (hasAnyData) {
+    const response = buildResponse(fetched);
+    cachedResponse = response;
+    cacheTimestamp = Date.now();
+    return NextResponse.json(response);
+  }
+
+  // All fetches failed — return stale cache if available (graceful degradation)
+  if (cachedResponse) {
+    return NextResponse.json(cachedResponse);
+  }
+
   return NextResponse.json({
-    agentData,
-    tokenPrices,
-    rankings,
-    competition,
-    live: true,
+    agentData: {},
+    tokenPrices: {},
+    rankings: [],
+    competition: null,
+    live: false,
   });
 }

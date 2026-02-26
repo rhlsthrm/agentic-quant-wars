@@ -13,6 +13,7 @@ import ReasoningLogs from '@/app/components/ReasoningLogs';
 import PredictSection from '@/app/components/PredictSection';
 import HowItWorks from '@/app/components/HowItWorks';
 import Footer from '@/app/components/Footer';
+import LoadingSkeleton from '@/app/components/LoadingSkeleton';
 
 const POLL_INTERVAL_MS = 30_000;
 
@@ -55,30 +56,10 @@ export default function Page() {
           <div className="app-bg-glow" />
           <div className="app-bg-grid" />
         </div>
+        <div className="app-header-blur" />
         <div className="app-noise" />
         <Navbar />
-        <main
-          className="app-main"
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            minHeight: '60vh',
-          }}
-        >
-          <div
-            style={{
-              textAlign: 'center',
-              color: 'var(--text-secondary)',
-              fontFamily: 'JetBrains Mono',
-            }}
-          >
-            <div style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>
-              Connecting to agents...
-            </div>
-            <div style={{ fontSize: '0.8rem', opacity: 0.6 }}>Fetching live portfolio data</div>
-          </div>
-        </main>
+        <LoadingSkeleton />
       </div>
     );
   }
