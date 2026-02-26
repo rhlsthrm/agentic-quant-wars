@@ -95,7 +95,7 @@ export default function Page() {
     );
   }
 
-  const { agentData, stockPrices, rankings } = data || mockData;
+  const { agentData, rankings } = data || mockData;
 
   return (
     <div className="app">
@@ -111,7 +111,7 @@ export default function Page() {
       <div className="app-noise" />
 
       <Navbar />
-      <TickerBar stockPrices={stockPrices} />
+      <TickerBar />
 
       <main className="app-main">
         <Hero rankings={rankings} />

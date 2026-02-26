@@ -1,7 +1,5 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUpRight, ArrowDownRight, Zap } from 'lucide-react';
 import { AGENTS } from '@/app/data/agents';
 import type { AgentData, Trade } from '@/app/types';
@@ -10,8 +8,6 @@ interface FeedTrade extends Trade {
   agentId: string;
   agentName: string;
   agentColor: string;
-  agentAvatar: string;
-  key: string;
 }
 
 interface TradeFeedProps {
@@ -19,43 +15,21 @@ interface TradeFeedProps {
 }
 
 export default function TradeFeed({ agentData }: TradeFeedProps) {
-  const [visibleTrades, setVisibleTrades] = useState<FeedTrade[]>([]);
-  const feedRef = useRef<HTMLDivElement>(null);
-  const keyCounter = useRef(0);
+  if (!agentData) return null;
 
-  const allTrades: Omit<FeedTrade, 'key'>[] = [];
-  if (agentData) {
-    Object.values(agentData).forEach((agent) => {
-      agent.trades.forEach((trade) => {
-        allTrades.push({
-          ...trade,
-          agentId: agent.id,
-          agentName: agent.name,
-          agentColor: agent.color,
-          agentAvatar: agent.avatar,
-        });
+  const allTrades: FeedTrade[] = [];
+  Object.values(agentData).forEach((agent) => {
+    agent.trades.forEach((trade) => {
+      allTrades.push({
+        ...trade,
+        agentId: agent.id,
+        agentName: agent.name,
+        agentColor: agent.color,
       });
     });
-    allTrades.sort((a, b) => a.hour - b.hour);
-  }
-
-  useEffect(() => {
-    if (allTrades.length === 0) return;
-
-    const initial = allTrades
-      .slice(-20)
-      .map((t) => ({ ...t, key: `t-${++keyCounter.current}` }));
-    setVisibleTrades(initial);
-    let idx = Math.max(0, allTrades.length - 20);
-
-    const interval = setInterval(() => {
-      idx = (idx + 1) % allTrades.length;
-      const trade = { ...allTrades[idx], key: `t-${++keyCounter.current}` };
-      setVisibleTrades((current) => [...current.slice(-24), trade]);
-    }, 2500);
-
-    return () => clearInterval(interval);
-  }, [agentData]);
+  });
+  // Newest first
+  allTrades.sort((a, b) => b.hour - a.hour);
 
   return (
     <section className="feed-section section section-gap">
@@ -63,55 +37,54 @@ export default function TradeFeed({ agentData }: TradeFeedProps) {
         <div className="section-label">Live Feed</div>
         <h2 className="section-title">Trade Activity</h2>
         <p className="section-subtitle">
-          Real-time execution log — every crypto trade executed via LI.FI Protocol
+          Every crypto trade executed via LI.FI Protocol
         </p>
       </div>
 
       <div className="feed-container">
         <div className="feed-live-bar">
           <Zap size={12} />
-          <span>LIVE TRADE FEED</span>
+          <span>TRADE FEED</span>
           <span className="feed-dot-pulse" />
         </div>
 
-        <div className="feed-list" ref={feedRef}>
-          <AnimatePresence initial={false}>
-            {visibleTrades.map((trade) => (
-              <motion.div
-                key={trade.key}
-                className={`feed-item ${trade.type === 'BUY' ? 'buy' : 'sell'}`}
-                initial={{ opacity: 0, x: -20, height: 0 }}
-                animate={{ opacity: 1, x: 0, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <div className="fi-time">
-                  <span className="fi-hour">H{trade.hour}</span>
-                </div>
-                <div
-                  className="fi-agent-dot"
-                  style={{ background: trade.agentColor }}
-                  title={trade.agentName}
-                />
-                <div className="fi-type-badge">
-                  {trade.type === 'BUY' ? (
-                    <ArrowUpRight size={11} />
-                  ) : (
-                    <ArrowDownRight size={11} />
-                  )}
-                  {trade.type}
-                </div>
-                <div className="fi-details">
-                  <span className="fi-shares">{trade.shares}</span>
-                  <span className="fi-symbol">{trade.stock}</span>
-                  <span className="fi-at">@</span>
-                  <span className="fi-price">${trade.price.toFixed(2)}</span>
-                </div>
-                <div className="fi-value">${trade.value.toLocaleString()}</div>
-                <div className="fi-agent-name">{trade.agentName}</div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
+        <div className="feed-list">
+          {allTrades.length === 0 && (
+            <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)', fontSize: '12px' }}>
+              No trades yet — waiting for agents to execute...
+            </div>
+          )}
+          {allTrades.map((trade, i) => (
+            <div
+              key={`${trade.agentId}-${trade.hour}-${trade.stock}-${i}`}
+              className={`feed-item ${trade.type === 'BUY' ? 'buy' : 'sell'}`}
+            >
+              <div className="fi-time">
+                <span className="fi-hour">H{trade.hour}</span>
+              </div>
+              <div
+                className="fi-agent-dot"
+                style={{ background: trade.agentColor }}
+                title={trade.agentName}
+              />
+              <div className="fi-type-badge">
+                {trade.type === 'BUY' ? (
+                  <ArrowUpRight size={11} />
+                ) : (
+                  <ArrowDownRight size={11} />
+                )}
+                {trade.type}
+              </div>
+              <div className="fi-details">
+                <span className="fi-shares">{trade.shares}</span>
+                <span className="fi-symbol">{trade.stock}</span>
+                <span className="fi-at">@</span>
+                <span className="fi-price">${trade.price.toFixed(2)}</span>
+              </div>
+              <div className="fi-value">${trade.value.toLocaleString()}</div>
+              <div className="fi-agent-name">{trade.agentName}</div>
+            </div>
+          ))}
         </div>
 
         <div className="feed-stats">

@@ -1,14 +1,9 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useRef, useEffect } from 'react';
 import { Terminal, ChevronRight } from 'lucide-react';
 import { AGENTS } from '@/app/data/agents';
-import type { AgentData, ReasoningLog } from '@/app/types';
-
-interface KeyedLog extends ReasoningLog {
-  key: string;
-}
+import type { AgentData } from '@/app/types';
 
 interface ReasoningLogsProps {
   agentData: Record<string, AgentData>;
@@ -17,41 +12,18 @@ interface ReasoningLogsProps {
 export default function ReasoningLogs({ agentData }: ReasoningLogsProps) {
   const firstAvailable = agentData ? Object.keys(agentData)[0] : AGENTS[0]?.id;
   const [activeAgent, setActiveAgent] = useState(firstAvailable || 'gpt');
-  const [visibleLogs, setVisibleLogs] = useState<KeyedLog[]>([]);
-  const [, setLogIndex] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const agent = agentData?.[activeAgent];
-  const logs = agent?.reasoningLogs || [];
+  // Show newest first
+  const logs = [...(agent?.reasoningLogs || [])].reverse();
 
-  useEffect(() => {
-    if (logs.length === 0) return;
-
-    setVisibleLogs(
-      logs.slice(-12).map((l, i) => ({ ...l, key: `init-${i}` })),
-    );
-    setLogIndex(logs.length - 12);
-
-    const interval = setInterval(() => {
-      setLogIndex((prev) => {
-        const next = (prev + 1) % logs.length;
-        const log = logs[next];
-        setVisibleLogs((current) => [
-          ...current.slice(-14),
-          { ...log, key: `${Date.now()}-${next}` },
-        ]);
-        return next;
-      });
-    }, 4000);
-
-    return () => clearInterval(interval);
-  }, [activeAgent, agentData]);
-
+  // Scroll to top when agent changes (newest is at top)
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      scrollRef.current.scrollTop = 0;
     }
-  }, [visibleLogs]);
+  }, [activeAgent]);
 
   if (!agentData) return null;
 
@@ -61,7 +33,7 @@ export default function ReasoningLogs({ agentData }: ReasoningLogsProps) {
         <div className="section-label">AI Reasoning</div>
         <h2 className="section-title">Agent Thought Process</h2>
         <p className="section-subtitle">
-          Live reasoning logs from each autonomous agent&apos;s decision engine
+          Reasoning logs from each autonomous agent&apos;s decision engine
         </p>
       </div>
 
@@ -108,29 +80,26 @@ export default function ReasoningLogs({ agentData }: ReasoningLogsProps) {
         </div>
 
         <div className="term-output" ref={scrollRef}>
-          <AnimatePresence initial={false}>
-            {visibleLogs.map((log) => (
-              <motion.div
-                key={log.key}
-                className="log-entry"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <div className="log-meta">
-                  <span className="log-timestamp">
-                    [{String(Math.floor(log.hour / 24)).padStart(2, '0')}d{' '}
-                    {String(log.hour % 24).padStart(2, '0')}h]
-                  </span>
-                  <span className="log-trade">{log.trade}</span>
-                </div>
-                <div className="log-text">
-                  <ChevronRight size={12} className="log-arrow" />
-                  {log.text}
-                </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
+          {logs.length === 0 && (
+            <div style={{ padding: '24px', color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)', fontSize: '12px' }}>
+              No reasoning logs yet — waiting for agent cycles...
+            </div>
+          )}
+          {logs.map((log, i) => (
+            <div key={`${activeAgent}-${log.hour}-${i}`} className="log-entry">
+              <div className="log-meta">
+                <span className="log-timestamp">
+                  [{String(Math.floor(log.hour / 24)).padStart(2, '0')}d{' '}
+                  {String(log.hour % 24).padStart(2, '0')}h]
+                </span>
+                <span className="log-trade">{log.trade}</span>
+              </div>
+              <div className="log-text">
+                <ChevronRight size={12} className="log-arrow" />
+                {log.text}
+              </div>
+            </div>
+          ))}
           <div className="log-cursor">
             <span className="cursor-char">_</span>
           </div>
