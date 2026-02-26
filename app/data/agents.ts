@@ -3,7 +3,7 @@ import type { AgentConfig } from '@/app/types';
 export const AGENTS: AgentConfig[] = [
   {
     id: 'gpt',
-    name: 'GPT-4o',
+    name: 'GPT-5.2 Pro',
     model: 'OpenAI',
     color: '#10a37f',
     colorLight: '#10a37f33',
@@ -13,7 +13,7 @@ export const AGENTS: AgentConfig[] = [
   },
   {
     id: 'claude',
-    name: 'Claude Opus',
+    name: 'Claude Opus 4.6',
     model: 'Anthropic',
     color: '#d4a574',
     colorLight: '#d4a57433',
@@ -23,7 +23,7 @@ export const AGENTS: AgentConfig[] = [
   },
   {
     id: 'gemini',
-    name: 'Gemini Ultra',
+    name: 'Gemini 3 Pro',
     model: 'Google',
     color: '#4285f4',
     colorLight: '#4285f433',
