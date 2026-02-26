@@ -76,7 +76,7 @@ export default function TradeFeed({ agentData }: TradeFeedProps) {
                 {trade.type}
               </div>
               <div className="fi-details">
-                <span className="fi-shares">{trade.shares}</span>
+                <span className="fi-tokens">{trade.tokens.toFixed(2)}</span>
                 <span className="fi-symbol">{trade.stock}</span>
                 <span className="fi-at">@</span>
                 <span className="fi-price">${trade.price.toFixed(2)}</span>

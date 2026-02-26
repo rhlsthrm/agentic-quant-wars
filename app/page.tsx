@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
-import { runSimulation } from '@/app/data/mockTradingEngine';
+import { useState, useEffect } from 'react';
 import type { AgentsResponse } from '@/app/types';
 import Navbar from '@/app/components/Navbar';
 import TickerBar from '@/app/components/TickerBar';
@@ -18,11 +17,6 @@ import Footer from '@/app/components/Footer';
 const POLL_INTERVAL_MS = 30_000;
 
 export default function Page() {
-  const mockData = useMemo(() => {
-    const sim = runSimulation();
-    return { ...sim, live: false } as AgentsResponse;
-  }, []);
-
   const [data, setData] = useState<AgentsResponse | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -35,15 +29,9 @@ export default function Page() {
         if (!res.ok) throw new Error(`${res.status}`);
         const json: AgentsResponse = await res.json();
         if (cancelled) return;
-
-        if (json.live && Object.keys(json.agentData).length > 0) {
-          setData(json);
-        } else {
-          setData(mockData);
-        }
+        setData(json);
       } catch {
-        if (cancelled) return;
-        setData(mockData);
+        // keep previous data if we had it
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -55,7 +43,7 @@ export default function Page() {
       cancelled = true;
       clearInterval(interval);
     };
-  }, [mockData]);
+  }, []);
 
   if (loading) {
     return (
@@ -95,7 +83,11 @@ export default function Page() {
     );
   }
 
-  const { agentData, rankings } = data || mockData;
+  const hasData = data && data.live && Object.keys(data.agentData).length > 0;
+  const agentData = hasData ? data.agentData : {};
+  const rankings = hasData ? data.rankings : [];
+  const tokenPrices = data?.tokenPrices ?? {};
+  const competition = data?.competition ?? null;
 
   return (
     <div className="app">
@@ -111,15 +103,15 @@ export default function Page() {
       <div className="app-noise" />
 
       <Navbar />
-      <TickerBar />
+      <TickerBar tokenPrices={tokenPrices} />
 
       <main className="app-main">
-        <Hero rankings={rankings} />
+        <Hero rankings={rankings} competition={competition} />
         <div className="divider" />
         <Leaderboard rankings={rankings} />
         <div className="divider" />
         <div id="trajectories">
-          <PerformanceChart agentData={agentData} />
+          <PerformanceChart agentData={agentData} durationHours={competition?.durationHours ?? 168} />
         </div>
         <div className="divider" />
         <AgentCards rankings={rankings} agentData={agentData} />

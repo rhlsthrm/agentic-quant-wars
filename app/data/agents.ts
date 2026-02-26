@@ -54,30 +54,16 @@ export const AGENTS: AgentConfig[] = [
 ];
 
 export const TOKENS: Token[] = [
-  { symbol: 'BTC', name: 'Bitcoin', sector: 'Layer 1', price: 97250.0 },
-  { symbol: 'ETH', name: 'Ethereum', sector: 'Layer 1', price: 3420.5 },
-  { symbol: 'SOL', name: 'Solana', sector: 'Layer 1', price: 178.3 },
-  { symbol: 'AVAX', name: 'Avalanche', sector: 'Layer 1', price: 38.9 },
-  { symbol: 'LINK', name: 'Chainlink', sector: 'Oracle', price: 18.75 },
-  { symbol: 'ARB', name: 'Arbitrum', sector: 'Layer 2', price: 1.12 },
-  { symbol: 'ONDO', name: 'Ondo Finance', sector: 'RWA', price: 1.48 },
-  { symbol: 'AAVE', name: 'Aave', sector: 'DeFi', price: 285.6 },
-  { symbol: 'UNI', name: 'Uniswap', sector: 'DeFi', price: 12.45 },
-  { symbol: 'DOGE', name: 'Dogecoin', sector: 'Meme', price: 0.182 },
+  { symbol: 'BTC', name: 'Bitcoin', sector: 'Layer 1' },
+  { symbol: 'ETH', name: 'Ethereum', sector: 'Layer 1' },
+  { symbol: 'SOL', name: 'Solana', sector: 'Layer 1' },
+  { symbol: 'AVAX', name: 'Avalanche', sector: 'Layer 1' },
+  { symbol: 'LINK', name: 'Chainlink', sector: 'Oracle' },
+  { symbol: 'ARB', name: 'Arbitrum', sector: 'Layer 2' },
+  { symbol: 'ONDO', name: 'Ondo Finance', sector: 'RWA' },
+  { symbol: 'AAVE', name: 'Aave', sector: 'DeFi' },
+  { symbol: 'UNI', name: 'Uniswap', sector: 'DeFi' },
+  { symbol: 'DOGE', name: 'Dogecoin', sector: 'Meme' },
 ];
 
-export const STOCKS = TOKENS;
-
 export const STARTING_CAPITAL = 2000;
-
-const _now = new Date();
-const _start = new Date(_now);
-_start.setDate(_start.getDate() - 1);
-_start.setHours(9, 30, 0, 0);
-const _end = new Date(_now);
-_end.setDate(_end.getDate() + 6);
-_end.setHours(16, 0, 0, 0);
-
-export const COMPETITION_START = _start;
-export const COMPETITION_END = _end;
-export const COMPETITION_DURATION_HOURS = 168;

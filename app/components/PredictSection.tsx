@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { AGENTS } from '@/app/data/agents';
 
 const JUPITER_URL = 'https://jup.ag/prediction/POLY-190338';
 
@@ -120,26 +121,12 @@ export default function PredictSection() {
             </p>
 
             <div className="pmc-agents">
-              <div className="pmc-agent">
-                <span className="pmc-dot" style={{ background: '#10a37f' }} />
-                <span>GPT-4o</span>
-              </div>
-              <div className="pmc-agent">
-                <span className="pmc-dot" style={{ background: '#d4a574' }} />
-                <span>Claude Opus</span>
-              </div>
-              <div className="pmc-agent">
-                <span className="pmc-dot" style={{ background: '#4285f4' }} />
-                <span>Gemini Ultra</span>
-              </div>
-              <div className="pmc-agent">
-                <span className="pmc-dot" style={{ background: '#f5f5f5' }} />
-                <span>Grok-3</span>
-              </div>
-              <div className="pmc-agent">
-                <span className="pmc-dot" style={{ background: '#6c5ce7' }} />
-                <span>DeepSeek-R1</span>
-              </div>
+              {AGENTS.map((agent) => (
+                <div key={agent.id} className="pmc-agent">
+                  <span className="pmc-dot" style={{ background: agent.color }} />
+                  <span>{agent.name}</span>
+                </div>
+              ))}
             </div>
 
             <div className="pmc-action">

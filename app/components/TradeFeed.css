@@ -55,7 +55,7 @@
 .sell .fi-type-badge { background: var(--loss-red-dim); color: var(--loss-red); }
 
 .fi-details { display: flex; align-items: center; gap: 4px; flex: 1; }
-.fi-shares { color: var(--text-primary); font-weight: 500; }
+.fi-tokens { color: var(--text-primary); font-weight: 500; }
 .fi-symbol { color: var(--text-bright); font-weight: 700; }
 .fi-at { color: var(--text-tertiary); }
 .fi-price { color: var(--text-secondary); }

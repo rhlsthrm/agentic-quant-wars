@@ -14,7 +14,7 @@ export interface AgentConfig {
 export interface Holding {
   symbol: string;
   name: string;
-  shares: number;
+  tokens: number;
   avgCost: number;
   currentPrice: number;
   value: number;
@@ -38,7 +38,7 @@ export interface Trade {
   stock: string;
   stockName: string;
   sector: string;
-  shares: number;
+  tokens: number;
   price: number;
   value: number;
   hour: number;
@@ -70,13 +70,19 @@ export interface Token {
   symbol: string;
   name: string;
   sector: string;
-  price: number;
+}
+
+export interface Competition {
+  start: string;
+  end: string;
+  durationHours: number;
 }
 
 export interface AgentsResponse {
   agentData: Record<string, AgentData>;
-  stockPrices: Record<string, number[]>;
+  tokenPrices: Record<string, number>;
   rankings: AgentData[];
+  competition: Competition | null;
   live: boolean;
 }
 

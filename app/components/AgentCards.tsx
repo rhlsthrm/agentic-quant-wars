@@ -140,7 +140,7 @@ export default function AgentCards({ rankings }: AgentCardsProps) {
                   >
                     <div className="holdings-header">
                       <span>Asset</span>
-                      <span>Shares</span>
+                      <span>Tokens</span>
                       <span>Value</span>
                       <span>PnL</span>
                     </div>
@@ -148,7 +148,7 @@ export default function AgentCards({ rankings }: AgentCardsProps) {
                       agent.portfolio.holdings.map((h) => (
                         <div key={h.symbol} className="holding-row">
                           <span className="holding-symbol">{h.symbol}</span>
-                          <span className="holding-shares">{h.shares}</span>
+                          <span className="holding-tokens">{h.tokens.toFixed(2)}</span>
                           <span className="holding-value">${h.value.toLocaleString()}</span>
                           <span className={`holding-pnl ${h.pnl >= 0 ? 'profit' : 'loss'}`}>
                             {h.pnl >= 0 ? '+' : ''}

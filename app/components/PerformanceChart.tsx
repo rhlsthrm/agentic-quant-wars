@@ -16,9 +16,10 @@ import type { AgentData } from '@/app/types';
 
 interface PerformanceChartProps {
   agentData: Record<string, AgentData>;
+  durationHours: number;
 }
 
-export default function PerformanceChart({ agentData }: PerformanceChartProps) {
+export default function PerformanceChart({ agentData, durationHours }: PerformanceChartProps) {
   const [activeAgents, setActiveAgents] = useState<string[]>(() =>
     AGENTS.filter((a) => agentData?.[a.id]).map((a) => a.id),
   );
@@ -27,7 +28,7 @@ export default function PerformanceChart({ agentData }: PerformanceChartProps) {
   if (!agentData) return null;
 
   const chartData: Record<string, number | string>[] = [];
-  for (let hour = 0; hour <= 168; hour += 2) {
+  for (let hour = 0; hour <= durationHours; hour += 2) {
     const point: Record<string, number | string> = { hour };
     AGENTS.forEach((agent) => {
       const data = agentData[agent.id];
@@ -72,7 +73,7 @@ export default function PerformanceChart({ agentData }: PerformanceChartProps) {
         <div className="section-label">Performance</div>
         <h2 className="section-title">Portfolio Trajectories</h2>
         <p className="section-subtitle">
-          168-hour performance comparison across all five AI agents
+          Real-time performance comparison across all AI agents
         </p>
       </div>
 

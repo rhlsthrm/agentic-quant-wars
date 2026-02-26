@@ -80,7 +80,7 @@
 }
 .holding-row:last-child { border-bottom: none; }
 .holding-symbol { font-weight: 700; color: var(--text-primary); }
-.holding-shares { color: var(--text-secondary); }
+.holding-tokens { color: var(--text-secondary); }
 .holding-value { color: var(--text-primary); }
 .holding-pnl.profit { color: var(--green); font-weight: 600; }
 .holding-pnl.loss { color: var(--loss-red); font-weight: 600; }

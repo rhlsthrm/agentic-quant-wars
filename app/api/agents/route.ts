@@ -46,10 +46,10 @@ async function fetchAgent(
   }
 }
 
-function toHourOffset(timestamp: string, competitionStart: Date): number {
+function toHourOffset(timestamp: string, competitionStart: Date, durationHours: number): number {
   const ms = new Date(timestamp).getTime() - competitionStart.getTime();
   const hours = Math.max(0, Math.round(ms / 3600000));
-  return Math.min(hours, 168);
+  return Math.min(hours, durationHours);
 }
 
 function transformAgent(
@@ -59,6 +59,7 @@ function transformAgent(
   const competitionStart = dashboard.info.competitionStart
     ? new Date(dashboard.info.competitionStart)
     : new Date(dashboard.info.startedAt);
+  const durationHours = (dashboard.info.competitionDurationDays || 7) * 24;
 
   const portfolio = {
     cash: dashboard.portfolio?.cash ?? 0,
@@ -73,7 +74,7 @@ function transformAgent(
       .map((p) => ({
         symbol: p.symbol,
         name: p.symbol,
-        shares: parseFloat(p.balance),
+        tokens: parseFloat(p.balance),
         avgCost: 0,
         currentPrice: p.priceUsd,
         value: Math.round(p.balanceUsd * 100) / 100,
@@ -88,7 +89,7 @@ function transformAgent(
   const chronological = [...history].reverse();
 
   for (const cycle of chronological) {
-    const hour = toHourOffset(cycle.timestamp, competitionStart);
+    const hour = toHourOffset(cycle.timestamp, competitionStart, durationHours);
     let hadValidTrade = false;
 
     for (const trade of cycle.trades || []) {
@@ -101,7 +102,7 @@ function transformAgent(
         stock: symbol,
         stockName: symbol,
         sector: '',
-        shares: trade.executed_price
+        tokens: trade.executed_price
           ? parseFloat((trade.amount_usd / trade.executed_price).toFixed(6))
           : 0,
         price: trade.executed_price ?? 0,
@@ -141,13 +142,13 @@ function transformAgent(
   }
 
   const sparsePoints = (dashboard.portfolioHistory || []).map((p) => ({
-    hour: toHourOffset(p.timestamp, competitionStart),
+    hour: toHourOffset(p.timestamp, competitionStart, durationHours),
     value: p.value,
   }));
 
   const maxHour =
     sparsePoints.length > 0
-      ? Math.min(168, Math.max(...sparsePoints.map((p) => p.hour)))
+      ? Math.min(durationHours, Math.max(...sparsePoints.map((p) => p.hour)))
       : 0;
 
   const portfolioHistory: PortfolioSnapshot[] = [];
@@ -177,23 +178,36 @@ export async function GET(): Promise<NextResponse<AgentsResponse>> {
   if (liveAgents.length === 0) {
     return NextResponse.json({
       agentData: {},
-      stockPrices: {},
+      tokenPrices: {},
       rankings: [],
+      competition: null,
       live: false,
     });
   }
 
-  const results = await Promise.all(
+  const fetched = await Promise.all(
     liveAgents.map(async (agent) => {
       const data = await fetchAgent(agent);
-      if (!data) return null;
-      return transformAgent(agent, data);
+      return { agent, data };
     }),
   );
 
   const agentData: Record<string, AgentData> = {};
-  for (const result of results) {
-    if (result) agentData[result.id] = { ...result, rank: 0 };
+  let competition: AgentsResponse['competition'] = null;
+
+  for (const { agent, data } of fetched) {
+    if (!data) continue;
+
+    if (!competition) {
+      const info = data.dashboard.info;
+      const start = info.competitionStart || info.startedAt;
+      const durationHours = (info.competitionDurationDays || 7) * 24;
+      const end = new Date(new Date(start).getTime() + durationHours * 3600000).toISOString();
+      competition = { start, end, durationHours };
+    }
+
+    const result = transformAgent(agent, data);
+    agentData[result.id] = { ...result, rank: 0 };
   }
 
   const rankings = Object.values(agentData).sort(
@@ -203,10 +217,20 @@ export async function GET(): Promise<NextResponse<AgentsResponse>> {
     agentData[agent.id].rank = i + 1;
   });
 
+  const tokenPrices: Record<string, number> = {};
+  for (const agent of Object.values(agentData)) {
+    for (const h of agent.portfolio.holdings) {
+      if (h.currentPrice > 0) {
+        tokenPrices[h.symbol] = h.currentPrice;
+      }
+    }
+  }
+
   return NextResponse.json({
     agentData,
-    stockPrices: {},
+    tokenPrices,
     rankings,
+    competition,
     live: true,
   });
 }

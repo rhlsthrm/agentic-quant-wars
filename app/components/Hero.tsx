@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { COMPETITION_START, COMPETITION_END, STARTING_CAPITAL } from '@/app/data/agents';
+import { AGENTS, STARTING_CAPITAL } from '@/app/data/agents';
 import { LifiLogo, PhantomLogo } from './Logos';
-import type { AgentData } from '@/app/types';
+import type { AgentData, Competition } from '@/app/types';
 
 interface CountdownUnitProps {
   value: number;
@@ -22,10 +22,11 @@ function CountdownUnit({ value, label }: CountdownUnitProps) {
   );
 }
 
-function useCountdown(targetDate: Date) {
+function useCountdown(targetDate: Date | null) {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   useEffect(() => {
+    if (!targetDate) return;
     const tick = () => {
       const now = new Date();
       const diff = targetDate.getTime() - now.getTime();
@@ -50,11 +51,21 @@ function useCountdown(targetDate: Date) {
 
 interface HeroProps {
   rankings: AgentData[];
+  competition: Competition | null;
 }
 
-export default function Hero(_props: HeroProps) {
-  const timeLeft = useCountdown(COMPETITION_END);
-  const isLive = new Date() >= COMPETITION_START && new Date() <= COMPETITION_END;
+export default function Hero({ competition }: HeroProps) {
+  const endDate = useMemo(
+    () => (competition ? new Date(competition.end) : null),
+    [competition],
+  );
+  const timeLeft = useCountdown(endDate);
+
+  const now = new Date();
+  const isLive =
+    competition != null &&
+    now >= new Date(competition.start) &&
+    now <= new Date(competition.end);
 
   return (
     <section className="hero">
@@ -70,7 +81,9 @@ export default function Hero(_props: HeroProps) {
             <span className="status-ping-dot" />
           </span>
           <span className="status-text">
-            {isLive ? 'Competition Live — 168 Hours' : 'Competition Upcoming'}
+            {isLive
+              ? `Competition Live — ${competition!.durationHours} Hours`
+              : 'Competition Upcoming'}
           </span>
           <svg
             width="12"
@@ -143,25 +156,27 @@ export default function Hero(_props: HeroProps) {
           </div>
         </motion.div>
 
-        <motion.div
-          className="hero-countdown"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-        >
-          <div className="countdown-header">
-            {isLive ? 'TIME REMAINING' : 'COMPETITION STARTS IN'}
-          </div>
-          <div className="countdown-grid">
-            <CountdownUnit value={timeLeft.days} label="DAYS" />
-            <span className="countdown-colon">:</span>
-            <CountdownUnit value={timeLeft.hours} label="HRS" />
-            <span className="countdown-colon">:</span>
-            <CountdownUnit value={timeLeft.minutes} label="MIN" />
-            <span className="countdown-colon">:</span>
-            <CountdownUnit value={timeLeft.seconds} label="SEC" />
-          </div>
-        </motion.div>
+        {competition && (
+          <motion.div
+            className="hero-countdown"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+          >
+            <div className="countdown-header">
+              {isLive ? 'TIME REMAINING' : 'COMPETITION STARTS IN'}
+            </div>
+            <div className="countdown-grid">
+              <CountdownUnit value={timeLeft.days} label="DAYS" />
+              <span className="countdown-colon">:</span>
+              <CountdownUnit value={timeLeft.hours} label="HRS" />
+              <span className="countdown-colon">:</span>
+              <CountdownUnit value={timeLeft.minutes} label="MIN" />
+              <span className="countdown-colon">:</span>
+              <CountdownUnit value={timeLeft.seconds} label="SEC" />
+            </div>
+          </motion.div>
+        )}
 
         <motion.div
           className="hero-cta"
@@ -193,19 +208,21 @@ export default function Hero(_props: HeroProps) {
           transition={{ duration: 0.8, delay: 1.0 }}
         >
           <div className="hero-stat">
-            <div className="hero-stat-value">5</div>
+            <div className="hero-stat-value">{AGENTS.length}</div>
             <div className="hero-stat-label">AI Agents</div>
           </div>
           <div className="hero-stat-divider" />
           <div className="hero-stat">
             <div className="hero-stat-value">
-              ${(STARTING_CAPITAL * 5).toLocaleString()}
+              ${(STARTING_CAPITAL * AGENTS.length).toLocaleString()}
             </div>
             <div className="hero-stat-label">Total Capital</div>
           </div>
           <div className="hero-stat-divider" />
           <div className="hero-stat">
-            <div className="hero-stat-value">168h</div>
+            <div className="hero-stat-value">
+              {competition ? `${competition.durationHours}h` : '—'}
+            </div>
             <div className="hero-stat-label">Duration</div>
           </div>
           <div className="hero-stat-divider" />

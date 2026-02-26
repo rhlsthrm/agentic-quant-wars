@@ -2,24 +2,35 @@
 
 import { TOKENS } from '@/app/data/agents';
 
-export default function TickerBar() {
-  const items = TOKENS.map((token) => (
-    <span key={token.symbol} className="ticker-item">
-      <span className="ticker-symbol">{token.symbol}</span>
-      <span className="ticker-price">
-        ${token.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+interface TickerBarProps {
+  tokenPrices: Record<string, number>;
+}
+
+export default function TickerBar({ tokenPrices }: TickerBarProps) {
+  const items = TOKENS.map((token) => {
+    const price = tokenPrices[token.symbol];
+    if (price == null) return null;
+    return (
+      <span key={token.symbol} className="ticker-item">
+        <span className="ticker-symbol">{token.symbol}</span>
+        <span className="ticker-price">
+          ${price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+        </span>
       </span>
-    </span>
-  ));
+    );
+  });
+
+  const filtered = items.filter(Boolean);
+  if (filtered.length === 0) return null;
 
   return (
     <div className="ticker-bar">
       <div className="ticker-track">
         <div className="ticker-scroll">
-          {items}
-          {items}
-          {items}
-          {items}
+          {filtered}
+          {filtered}
+          {filtered}
+          {filtered}
         </div>
       </div>
     </div>
