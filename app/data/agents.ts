@@ -33,7 +33,7 @@ export const AGENTS: AgentConfig[] = [
   },
   {
     id: 'grok',
-    name: 'Grok-3',
+    name: 'Grok 4.20',
     model: 'xAI',
     color: '#f5f5f5',
     colorLight: '#f5f5f533',
@@ -42,13 +42,13 @@ export const AGENTS: AgentConfig[] = [
     personality: 'Aggressive, meme-aware, volatile',
   },
   {
-    id: 'deepseek',
-    name: 'DeepSeek-R1',
-    model: 'DeepSeek',
+    id: 'glm',
+    name: 'GLM-5',
+    model: 'Zhipu AI',
     color: '#6c5ce7',
     colorLight: '#6c5ce733',
-    avatar: 'D',
-    strategy: 'Deep reasoning with chain-of-thought analysis',
+    avatar: 'GL',
+    strategy: 'Multi-modal pattern synthesis with deep reasoning',
     personality: 'Analytical, deliberate, thesis-driven',
   },
 ];

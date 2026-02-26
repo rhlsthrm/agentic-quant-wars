@@ -16,7 +16,7 @@ const AGENT_URL_MAP: Record<string, string> = {
   claude: 'AGENT_CLAUDE_URL',
   gemini: 'AGENT_GEMINI_URL',
   grok: 'AGENT_GROK_URL',
-  deepseek: 'AGENT_DEEPSEEK_URL',
+  glm: 'AGENT_GLM_URL',
 };
 
 function getAgentUrl(agentId: string): string | null {

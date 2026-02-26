@@ -79,11 +79,11 @@ export function GrokLogo({ size = 32, className = '' }: LogoProps) {
   );
 }
 
-export function DeepSeekLogo({ size = 32, className = '' }: LogoProps) {
+export function GLMLogo({ size = 32, className = '' }: LogoProps) {
   return (
     <img
-      src="/logos/deepseek.png"
-      alt="DeepSeek"
+      src="/logos/glm.png"
+      alt="GLM-5"
       width={size}
       height={size}
       className={className}
@@ -97,5 +97,5 @@ export const AGENT_LOGOS: Record<string, React.ComponentType<LogoProps>> = {
   claude: ClaudeLogo,
   gemini: GeminiLogo,
   grok: GrokLogo,
-  deepseek: DeepSeekLogo,
+  glm: GLMLogo,
 };
