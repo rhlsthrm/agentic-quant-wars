@@ -1,4 +1,4 @@
-import type { AgentConfig, Token } from '@/app/types';
+import type { AgentConfig } from '@/app/types';
 
 export const AGENTS: AgentConfig[] = [
   {
@@ -52,18 +52,3 @@ export const AGENTS: AgentConfig[] = [
     personality: 'Analytical, deliberate, thesis-driven',
   },
 ];
-
-export const TOKENS: Token[] = [
-  { symbol: 'BTC', name: 'Bitcoin', sector: 'Layer 1' },
-  { symbol: 'ETH', name: 'Ethereum', sector: 'Layer 1' },
-  { symbol: 'SOL', name: 'Solana', sector: 'Layer 1' },
-  { symbol: 'AVAX', name: 'Avalanche', sector: 'Layer 1' },
-  { symbol: 'LINK', name: 'Chainlink', sector: 'Oracle' },
-  { symbol: 'ARB', name: 'Arbitrum', sector: 'Layer 2' },
-  { symbol: 'ONDO', name: 'Ondo Finance', sector: 'RWA' },
-  { symbol: 'AAVE', name: 'Aave', sector: 'DeFi' },
-  { symbol: 'UNI', name: 'Uniswap', sector: 'DeFi' },
-  { symbol: 'DOGE', name: 'Dogecoin', sector: 'Meme' },
-];
-
-export const STARTING_CAPITAL = 2000;

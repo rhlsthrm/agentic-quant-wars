@@ -66,16 +66,11 @@ export interface AgentData extends AgentConfig {
   portfolioHistory: PortfolioSnapshot[];
 }
 
-export interface Token {
-  symbol: string;
-  name: string;
-  sector: string;
-}
-
 export interface Competition {
   start: string;
   end: string;
   durationHours: number;
+  startingCapital: number;
 }
 
 export interface AgentsResponse {

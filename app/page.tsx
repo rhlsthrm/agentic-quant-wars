@@ -111,7 +111,7 @@ export default function Page() {
         <Leaderboard rankings={rankings} />
         <div className="divider" />
         <div id="trajectories">
-          <PerformanceChart agentData={agentData} durationHours={competition?.durationHours ?? 168} />
+          <PerformanceChart agentData={agentData} durationHours={competition?.durationHours ?? 168} startingCapital={competition?.startingCapital ?? 100} />
         </div>
         <div className="divider" />
         <AgentCards rankings={rankings} agentData={agentData} />

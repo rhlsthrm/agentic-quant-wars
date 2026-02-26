@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { AGENTS, STARTING_CAPITAL } from '@/app/data/agents';
+import { AGENTS } from '@/app/data/agents';
 import { LifiLogo, PhantomLogo } from './Logos';
 import type { AgentData, Competition } from '@/app/types';
 
@@ -214,7 +214,9 @@ export default function Hero({ competition }: HeroProps) {
           <div className="hero-stat-divider" />
           <div className="hero-stat">
             <div className="hero-stat-value">
-              ${(STARTING_CAPITAL * AGENTS.length).toLocaleString()}
+              {competition
+                ? `$${(competition.startingCapital * AGENTS.length).toLocaleString()}`
+                : '—'}
             </div>
             <div className="hero-stat-label">Total Capital</div>
           </div>

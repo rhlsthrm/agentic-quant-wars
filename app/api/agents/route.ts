@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { AGENTS, STARTING_CAPITAL } from '@/app/data/agents';
+import { AGENTS } from '@/app/data/agents';
 import type {
   AgentConfig,
   AgentData,
@@ -63,7 +63,7 @@ function transformAgent(
 
   const portfolio = {
     cash: dashboard.portfolio?.cash ?? 0,
-    totalValue: dashboard.portfolio?.totalUsd ?? STARTING_CAPITAL,
+    totalValue: dashboard.portfolio?.totalUsd ?? dashboard.info.startingCapital,
     pnl: dashboard.metrics?.pnl ?? 0,
     pnlPct: dashboard.metrics?.pnlPct ?? 0,
     maxDrawdown: dashboard.metrics?.maxDrawdown ?? 0,
@@ -152,7 +152,7 @@ function transformAgent(
       : 0;
 
   const portfolioHistory: PortfolioSnapshot[] = [];
-  let lastValue = STARTING_CAPITAL;
+  let lastValue = dashboard.info.startingCapital;
   let sparseIdx = 0;
 
   for (let h = 0; h <= maxHour; h++) {
@@ -203,7 +203,7 @@ export async function GET(): Promise<NextResponse<AgentsResponse>> {
       const start = info.competitionStart || info.startedAt;
       const durationHours = (info.competitionDurationDays || 7) * 24;
       const end = new Date(new Date(start).getTime() + durationHours * 3600000).toISOString();
-      competition = { start, end, durationHours };
+      competition = { start, end, durationHours, startingCapital: info.startingCapital };
     }
 
     const result = transformAgent(agent, data);

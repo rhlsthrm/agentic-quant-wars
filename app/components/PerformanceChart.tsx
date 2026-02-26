@@ -11,15 +11,16 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import { AGENTS, STARTING_CAPITAL } from '@/app/data/agents';
+import { AGENTS } from '@/app/data/agents';
 import type { AgentData } from '@/app/types';
 
 interface PerformanceChartProps {
   agentData: Record<string, AgentData>;
   durationHours: number;
+  startingCapital: number;
 }
 
-export default function PerformanceChart({ agentData, durationHours }: PerformanceChartProps) {
+export default function PerformanceChart({ agentData, durationHours, startingCapital }: PerformanceChartProps) {
   const [activeAgents, setActiveAgents] = useState<string[]>(() =>
     AGENTS.filter((a) => agentData?.[a.id]).map((a) => a.id),
   );
@@ -36,10 +37,10 @@ export default function PerformanceChart({ agentData, durationHours }: Performan
         if (chartType === 'value') {
           point[agent.id] = data.portfolioHistory[hour].value;
         } else if (chartType === 'pnl') {
-          point[agent.id] = data.portfolioHistory[hour].value - STARTING_CAPITAL;
+          point[agent.id] = data.portfolioHistory[hour].value - startingCapital;
         } else {
           point[agent.id] =
-            ((data.portfolioHistory[hour].value - STARTING_CAPITAL) / STARTING_CAPITAL) * 100;
+            ((data.portfolioHistory[hour].value - startingCapital) / startingCapital) * 100;
         }
       }
     });
@@ -194,7 +195,7 @@ export default function PerformanceChart({ agentData, durationHours }: Performan
             {chartType === 'value' && (
               <Line
                 type="monotone"
-                dataKey={() => STARTING_CAPITAL}
+                dataKey={() => startingCapital}
                 stroke="var(--text-tertiary)"
                 strokeWidth={1}
                 strokeDasharray="5 5"
