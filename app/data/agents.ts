@@ -33,7 +33,7 @@ export const AGENTS: AgentConfig[] = [
   },
   {
     id: 'grok',
-    name: 'Grok 4.20',
+    name: 'Grok 4',
     model: 'xAI',
     color: '#f5f5f5',
     colorLight: '#f5f5f533',
