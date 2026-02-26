@@ -163,6 +163,12 @@ function transformAgent(
     portfolioHistory.push({ hour: h, value: lastValue, cash: 0 });
   }
 
+  // Override totalValue with last portfolioHistory point — dashboard.portfolio.totalUsd
+  // can be stale/inconsistent, but portfolioHistory is derived from the same source as PnL
+  if (portfolioHistory.length > 0) {
+    portfolio.totalValue = portfolioHistory[portfolioHistory.length - 1].value;
+  }
+
   return {
     ...agent,
     portfolio,

@@ -81,7 +81,7 @@ export default function Leaderboard({ rankings }: LeaderboardProps) {
                 <span className="pnl-icon">
                   {isProfit ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
                 </span>
-                $
+                {isProfit ? '+' : '-'}$
                 {Math.abs(agent.portfolio.pnl).toLocaleString(undefined, {
                   minimumFractionDigits: 2,
                 })}
@@ -141,6 +141,17 @@ function MiniChart({ data, color }: MiniChartProps) {
 
   const width = 100;
   const height = 28;
+
+  // Single data point — render a flat line at midpoint
+  if (values.length === 1) {
+    const y = height / 2;
+    return (
+      <svg width={width} height={height} className="mini-chart">
+        <line x1={0} y1={y} x2={width} y2={y} stroke={color} strokeWidth="1.5" />
+      </svg>
+    );
+  }
+
   const points = values
     .map((v, i) => {
       const x = (i / (values.length - 1)) * width;
