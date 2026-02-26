@@ -1,9 +1,15 @@
-import { motion } from 'framer-motion';
-import { TrendingUp, TrendingDown, Trophy, ArrowUpRight, ArrowDownRight } from 'lucide-react';
-import { AGENT_LOGOS } from './Logos';
-import './Leaderboard.css';
+'use client';
 
-export default function Leaderboard({ rankings }) {
+import { motion } from 'framer-motion';
+import { Trophy, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { AGENT_LOGOS } from './Logos';
+import type { AgentData, PortfolioSnapshot } from '@/app/types';
+
+interface LeaderboardProps {
+  rankings: AgentData[];
+}
+
+export default function Leaderboard({ rankings }: LeaderboardProps) {
   if (!rankings || rankings.length === 0) return null;
 
   return (
@@ -17,7 +23,6 @@ export default function Leaderboard({ rankings }) {
       </div>
 
       <div className="leaderboard">
-        {/* Table header */}
         <div className="lb-header">
           <div className="lb-col lb-rank">Rank</div>
           <div className="lb-col lb-agent">Agent</div>
@@ -30,7 +35,6 @@ export default function Leaderboard({ rankings }) {
           <div className="lb-col lb-chart">24h Trend</div>
         </div>
 
-        {/* Rows */}
         {rankings.map((agent, i) => {
           const isProfit = agent.portfolio.pnl >= 0;
           const isFirst = i === 0;
@@ -51,11 +55,12 @@ export default function Leaderboard({ rankings }) {
               </div>
 
               <div className="lb-col lb-agent">
-                <div
-                  className="agent-avatar"
-                  style={{ background: `${agent.color}18` }}
-                >
-                  {AGENT_LOGOS[agent.id] && (() => { const Logo = AGENT_LOGOS[agent.id]; return <Logo size={20} />; })()}
+                <div className="agent-avatar" style={{ background: `${agent.color}18` }}>
+                  {AGENT_LOGOS[agent.id] &&
+                    (() => {
+                      const Logo = AGENT_LOGOS[agent.id];
+                      return <Logo size={20} />;
+                    })()}
                 </div>
                 <div className="agent-info">
                   <span className="agent-name">{agent.name}</span>
@@ -65,7 +70,10 @@ export default function Leaderboard({ rankings }) {
 
               <div className="lb-col lb-value">
                 <span className="value-main">
-                  ${agent.portfolio.totalValue.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                  $
+                  {agent.portfolio.totalValue.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                  })}
                 </span>
               </div>
 
@@ -73,11 +81,15 @@ export default function Leaderboard({ rankings }) {
                 <span className="pnl-icon">
                   {isProfit ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
                 </span>
-                ${Math.abs(agent.portfolio.pnl).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                $
+                {Math.abs(agent.portfolio.pnl).toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                })}
               </div>
 
               <div className={`lb-col lb-pnl-pct ${isProfit ? 'profit' : 'loss'}`}>
-                {isProfit ? '+' : ''}{agent.portfolio.pnlPct}%
+                {isProfit ? '+' : ''}
+                {agent.portfolio.pnlPct}%
               </div>
 
               <div className="lb-col lb-sharpe">
@@ -86,13 +98,9 @@ export default function Leaderboard({ rankings }) {
                 </span>
               </div>
 
-              <div className="lb-col lb-drawdown">
-                -{agent.portfolio.maxDrawdown}%
-              </div>
+              <div className="lb-col lb-drawdown">-{agent.portfolio.maxDrawdown}%</div>
 
-              <div className="lb-col lb-trades">
-                {agent.portfolio.totalTrades}
-              </div>
+              <div className="lb-col lb-trades">{agent.portfolio.totalTrades}</div>
 
               <div className="lb-col lb-chart">
                 <MiniChart data={agent.portfolioHistory.slice(-24)} color={agent.color} />
@@ -102,7 +110,6 @@ export default function Leaderboard({ rankings }) {
         })}
       </div>
 
-      {/* Legend */}
       <div className="lb-legend">
         <span className="lb-legend-item">
           <span className="legend-dot" style={{ background: 'var(--green)' }} />
@@ -112,32 +119,35 @@ export default function Leaderboard({ rankings }) {
           <span className="legend-dot" style={{ background: 'var(--red)' }} />
           Loss
         </span>
-        <span className="lb-legend-item">
-          DD = Max Drawdown
-        </span>
-        <span className="lb-legend-item">
-          Sharpe = Risk-Adjusted Return
-        </span>
+        <span className="lb-legend-item">DD = Max Drawdown</span>
+        <span className="lb-legend-item">Sharpe = Risk-Adjusted Return</span>
       </div>
     </section>
   );
 }
 
-function MiniChart({ data, color }) {
+interface MiniChartProps {
+  data: PortfolioSnapshot[];
+  color: string;
+}
+
+function MiniChart({ data, color }: MiniChartProps) {
   if (!data || data.length === 0) return null;
 
-  const values = data.map(d => d.value);
+  const values = data.map((d) => d.value);
   const min = Math.min(...values);
   const max = Math.max(...values);
   const range = max - min || 1;
 
   const width = 100;
   const height = 28;
-  const points = values.map((v, i) => {
-    const x = (i / (values.length - 1)) * width;
-    const y = height - ((v - min) / range) * height;
-    return `${x},${y}`;
-  }).join(' ');
+  const points = values
+    .map((v, i) => {
+      const x = (i / (values.length - 1)) * width;
+      const y = height - ((v - min) / range) * height;
+      return `${x},${y}`;
+    })
+    .join(' ');
 
   return (
     <svg width={width} height={height} className="mini-chart">

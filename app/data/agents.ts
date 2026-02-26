@@ -1,10 +1,6 @@
-// Agent configurations — UI metadata + API URLs from env
-// The 5 chosen frontier AI models for Agentic Quant Wars
+import type { AgentConfig, Token } from '@/app/types';
 
-// Map agent IDs to VITE_AGENT_<ID>_URL env vars
-const envUrl = (id) => import.meta.env[`VITE_AGENT_${id.toUpperCase()}_URL`] || null;
-
-export const AGENTS = [
+export const AGENTS: AgentConfig[] = [
   {
     id: 'gpt',
     name: 'GPT-4o',
@@ -14,7 +10,6 @@ export const AGENTS = [
     avatar: 'G',
     strategy: 'Momentum-driven with macro sentiment analysis',
     personality: 'Calculated, methodical, risk-aware',
-    apiUrl: envUrl('gpt'),
   },
   {
     id: 'claude',
@@ -25,7 +20,6 @@ export const AGENTS = [
     avatar: 'C',
     strategy: 'Value investing with contrarian positions',
     personality: 'Thoughtful, contrarian, patient',
-    apiUrl: envUrl('claude'),
   },
   {
     id: 'gemini',
@@ -36,7 +30,6 @@ export const AGENTS = [
     avatar: 'Ge',
     strategy: 'Diversified quant with ML pattern recognition',
     personality: 'Data-obsessed, adaptive, multi-signal',
-    apiUrl: envUrl('gemini'),
   },
   {
     id: 'grok',
@@ -47,7 +40,6 @@ export const AGENTS = [
     avatar: 'Gk',
     strategy: 'High-frequency sentiment arbitrage via X/Twitter signals',
     personality: 'Aggressive, meme-aware, volatile',
-    apiUrl: envUrl('grok'),
   },
   {
     id: 'deepseek',
@@ -58,34 +50,26 @@ export const AGENTS = [
     avatar: 'D',
     strategy: 'Deep reasoning with chain-of-thought analysis',
     personality: 'Analytical, deliberate, thesis-driven',
-    apiUrl: envUrl('deepseek'),
   },
 ];
 
-// Only agents with a configured API URL
-export const LIVE_AGENTS = AGENTS.filter(a => a.apiUrl);
-
-// Top crypto assets from CoinMarketCap Top 300 universe
-export const TOKENS = [
-  { symbol: 'BTC', name: 'Bitcoin', sector: 'Layer 1', price: 97250.00 },
-  { symbol: 'ETH', name: 'Ethereum', sector: 'Layer 1', price: 3420.50 },
-  { symbol: 'SOL', name: 'Solana', sector: 'Layer 1', price: 178.30 },
-  { symbol: 'AVAX', name: 'Avalanche', sector: 'Layer 1', price: 38.90 },
+export const TOKENS: Token[] = [
+  { symbol: 'BTC', name: 'Bitcoin', sector: 'Layer 1', price: 97250.0 },
+  { symbol: 'ETH', name: 'Ethereum', sector: 'Layer 1', price: 3420.5 },
+  { symbol: 'SOL', name: 'Solana', sector: 'Layer 1', price: 178.3 },
+  { symbol: 'AVAX', name: 'Avalanche', sector: 'Layer 1', price: 38.9 },
   { symbol: 'LINK', name: 'Chainlink', sector: 'Oracle', price: 18.75 },
   { symbol: 'ARB', name: 'Arbitrum', sector: 'Layer 2', price: 1.12 },
   { symbol: 'ONDO', name: 'Ondo Finance', sector: 'RWA', price: 1.48 },
-  { symbol: 'AAVE', name: 'Aave', sector: 'DeFi', price: 285.60 },
+  { symbol: 'AAVE', name: 'Aave', sector: 'DeFi', price: 285.6 },
   { symbol: 'UNI', name: 'Uniswap', sector: 'DeFi', price: 12.45 },
   { symbol: 'DOGE', name: 'Dogecoin', sector: 'Meme', price: 0.182 },
 ];
 
-// Alias for backward compat with mock engine
 export const STOCKS = TOKENS;
 
-// Starting capital — $2,000 USDC per agent
 export const STARTING_CAPITAL = 2000;
 
-// Competition duration — LIVE now, ends ~6 days from now
 const _now = new Date();
 const _start = new Date(_now);
 _start.setDate(_start.getDate() - 1);

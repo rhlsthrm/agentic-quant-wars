@@ -1,15 +1,28 @@
+'use client';
+
 import { useState, useEffect } from 'react';
-import './Navbar.css';
 
 function PredictIcons() {
   return (
     <span className="nav-predict-icons">
-      <img src="/logos/jupiter.png" alt="Jupiter" width={20} height={20} style={{ borderRadius: '50%', objectFit: 'contain' }} />
+      <img
+        src="/logos/jupiter.png"
+        alt="Jupiter"
+        width={20}
+        height={20}
+        style={{ borderRadius: '50%', objectFit: 'contain' }}
+      />
     </span>
   );
 }
 
-const NAV_LINKS = [
+interface NavLink {
+  id: string;
+  label: string;
+  icon?: React.ComponentType;
+}
+
+const NAV_LINKS: NavLink[] = [
   { id: 'arena', label: 'The Arena' },
   { id: 'trajectories', label: 'Trajectories' },
   { id: 'agents', label: 'Meet the Agents' },
@@ -27,11 +40,11 @@ export default function Navbar() {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
 
-      const sections = NAV_LINKS.map(l => document.getElementById(l.id)).filter(Boolean);
+      const sections = NAV_LINKS.map((l) => document.getElementById(l.id)).filter(Boolean);
       let current = '';
       for (const section of sections) {
-        const rect = section.getBoundingClientRect();
-        if (rect.top <= 200) current = section.id;
+        const rect = section!.getBoundingClientRect();
+        if (rect.top <= 200) current = section!.id;
       }
       setActiveSection(current);
     };
@@ -42,9 +55,8 @@ export default function Navbar() {
   return (
     <header className={`navbar ${scrolled ? 'scrolled' : ''}`}>
       <nav className="navbar-inner">
-        {/* Links — centered, no brand logo */}
         <div className="nav-links">
-          {NAV_LINKS.map(link => {
+          {NAV_LINKS.map((link) => {
             const Icon = link.icon;
             return (
               <a
@@ -59,7 +71,6 @@ export default function Navbar() {
           })}
         </div>
 
-        {/* Live indicator */}
         <div className="nav-actions">
           <span className="nav-live-badge">
             <span className="nav-live-dot" />

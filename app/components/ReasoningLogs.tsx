@@ -1,16 +1,25 @@
+'use client';
+
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Terminal, Brain, ChevronRight } from 'lucide-react';
-import { AGENTS } from '../data/agents';
-import './ReasoningLogs.css';
+import { Terminal, ChevronRight } from 'lucide-react';
+import { AGENTS } from '@/app/data/agents';
+import type { AgentData, ReasoningLog } from '@/app/types';
 
-export default function ReasoningLogs({ agentData }) {
-  // Default to first available agent (not hardcoded 'gpt')
+interface KeyedLog extends ReasoningLog {
+  key: string;
+}
+
+interface ReasoningLogsProps {
+  agentData: Record<string, AgentData>;
+}
+
+export default function ReasoningLogs({ agentData }: ReasoningLogsProps) {
   const firstAvailable = agentData ? Object.keys(agentData)[0] : AGENTS[0]?.id;
   const [activeAgent, setActiveAgent] = useState(firstAvailable || 'gpt');
-  const [visibleLogs, setVisibleLogs] = useState([]);
-  const [logIndex, setLogIndex] = useState(0);
-  const scrollRef = useRef(null);
+  const [visibleLogs, setVisibleLogs] = useState<KeyedLog[]>([]);
+  const [, setLogIndex] = useState(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const agent = agentData?.[activeAgent];
   const logs = agent?.reasoningLogs || [];
@@ -18,15 +27,19 @@ export default function ReasoningLogs({ agentData }) {
   useEffect(() => {
     if (logs.length === 0) return;
 
-    // Show last 10 logs initially
-    setVisibleLogs(logs.slice(-12));
+    setVisibleLogs(
+      logs.slice(-12).map((l, i) => ({ ...l, key: `init-${i}` })),
+    );
     setLogIndex(logs.length - 12);
 
     const interval = setInterval(() => {
-      setLogIndex(prev => {
+      setLogIndex((prev) => {
         const next = (prev + 1) % logs.length;
         const log = logs[next];
-        setVisibleLogs(current => [...current.slice(-14), { ...log, key: `${Date.now()}-${next}` }]);
+        setVisibleLogs((current) => [
+          ...current.slice(-14),
+          { ...log, key: `${Date.now()}-${next}` },
+        ]);
         return next;
       });
     }, 4000);
@@ -34,7 +47,6 @@ export default function ReasoningLogs({ agentData }) {
     return () => clearInterval(interval);
   }, [activeAgent, agentData]);
 
-  // Auto-scroll
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -49,18 +61,17 @@ export default function ReasoningLogs({ agentData }) {
         <div className="section-label">AI Reasoning</div>
         <h2 className="section-title">Agent Thought Process</h2>
         <p className="section-subtitle">
-          Live reasoning logs from each autonomous agent's decision engine
+          Live reasoning logs from each autonomous agent&apos;s decision engine
         </p>
       </div>
 
-      {/* Agent selector */}
       <div className="reasoning-agents">
-        {AGENTS.filter(a => agentData?.[a.id]).map(a => (
+        {AGENTS.filter((a) => agentData?.[a.id]).map((a) => (
           <button
             key={a.id}
             className={`ra-tab ${activeAgent === a.id ? 'active' : ''}`}
             onClick={() => setActiveAgent(a.id)}
-            style={{ '--tab-color': a.color }}
+            style={{ '--tab-color': a.color } as React.CSSProperties}
           >
             <span className="ra-dot" style={{ background: a.color }} />
             {a.name}
@@ -68,9 +79,7 @@ export default function ReasoningLogs({ agentData }) {
         ))}
       </div>
 
-      {/* Terminal */}
       <div className="reasoning-terminal">
-        {/* Terminal header */}
         <div className="term-header">
           <div className="term-dots">
             <span className="term-dot red" />
@@ -87,7 +96,6 @@ export default function ReasoningLogs({ agentData }) {
           </div>
         </div>
 
-        {/* Agent info bar */}
         <div className="term-info">
           <span className="ti-item">
             <span className="ti-label">STRATEGY:</span>
@@ -99,12 +107,11 @@ export default function ReasoningLogs({ agentData }) {
           </span>
         </div>
 
-        {/* Log output */}
         <div className="term-output" ref={scrollRef}>
           <AnimatePresence initial={false}>
-            {visibleLogs.map((log, i) => (
+            {visibleLogs.map((log) => (
               <motion.div
-                key={log.key || `${log.hour}-${i}`}
+                key={log.key}
                 className="log-entry"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -112,7 +119,8 @@ export default function ReasoningLogs({ agentData }) {
               >
                 <div className="log-meta">
                   <span className="log-timestamp">
-                    [{String(Math.floor(log.hour / 24)).padStart(2, '0')}d {String(log.hour % 24).padStart(2, '0')}h]
+                    [{String(Math.floor(log.hour / 24)).padStart(2, '0')}d{' '}
+                    {String(log.hour % 24).padStart(2, '0')}h]
                   </span>
                   <span className="log-trade">{log.trade}</span>
                 </div>

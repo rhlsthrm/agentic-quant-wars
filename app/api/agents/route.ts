@@ -1,47 +1,65 @@
-// Live data fetcher — replaces mockTradingEngine for real agent data
-// Fetches from each agent's Hono API and transforms to component shape
+import { NextResponse } from 'next/server';
+import { AGENTS, STARTING_CAPITAL } from '@/app/data/agents';
+import type {
+  AgentConfig,
+  AgentData,
+  AgentDashboardResponse,
+  AgentHistoryCycle,
+  AgentsResponse,
+  Trade,
+  ReasoningLog,
+  PortfolioSnapshot,
+} from '@/app/types';
 
-import { LIVE_AGENTS, STARTING_CAPITAL } from './agents';
+const AGENT_URL_MAP: Record<string, string> = {
+  gpt: 'AGENT_GPT_URL',
+  claude: 'AGENT_CLAUDE_URL',
+  gemini: 'AGENT_GEMINI_URL',
+  grok: 'AGENT_GROK_URL',
+  deepseek: 'AGENT_DEEPSEEK_URL',
+};
 
-/**
- * Fetch dashboard + history from a single agent API.
- * Returns null if the agent is unreachable.
- */
-async function fetchAgent(agent) {
-  const base = agent.apiUrl.replace(/\/+$/, '');
+function getAgentUrl(agentId: string): string | null {
+  const envKey = AGENT_URL_MAP[agentId];
+  if (!envKey) return null;
+  return process.env[envKey] || null;
+}
+
+async function fetchAgent(
+  agent: AgentConfig,
+): Promise<{ dashboard: AgentDashboardResponse; history: AgentHistoryCycle[] } | null> {
+  const url = getAgentUrl(agent.id);
+  if (!url) return null;
+
+  const base = url.replace(/\/+$/, '');
   try {
     const [dashRes, histRes] = await Promise.all([
-      fetch(`${base}/api/dashboard`),
-      fetch(`${base}/api/history?limit=500`),
+      fetch(`${base}/api/dashboard`, { next: { revalidate: 0 } }),
+      fetch(`${base}/api/history?limit=500`, { next: { revalidate: 0 } }),
     ]);
     if (!dashRes.ok || !histRes.ok) return null;
-    const dashboard = await dashRes.json();
-    const history = await histRes.json();
+    const dashboard: AgentDashboardResponse = await dashRes.json();
+    const history: AgentHistoryCycle[] = await histRes.json();
     return { dashboard, history };
   } catch {
     return null;
   }
 }
 
-/**
- * Convert ISO timestamp to hour offset from competition start.
- * Clamps to [0, 168].
- */
-function toHourOffset(timestamp, competitionStart) {
+function toHourOffset(timestamp: string, competitionStart: Date): number {
   const ms = new Date(timestamp).getTime() - competitionStart.getTime();
   const hours = Math.max(0, Math.round(ms / 3600000));
   return Math.min(hours, 168);
 }
 
-/**
- * Transform a single agent's API responses into the shape components expect.
- */
-function transformAgent(agent, { dashboard, history }) {
+function transformAgent(
+  agent: AgentConfig,
+  { dashboard, history }: { dashboard: AgentDashboardResponse; history: AgentHistoryCycle[] },
+): Omit<AgentData, 'rank'> {
   const competitionStart = dashboard.info.competitionStart
     ? new Date(dashboard.info.competitionStart)
     : new Date(dashboard.info.startedAt);
 
-  // Portfolio — merge portfolio + metrics + stats into component shape
   const portfolio = {
     cash: dashboard.portfolio?.cash ?? 0,
     totalValue: dashboard.portfolio?.totalUsd ?? STARTING_CAPITAL,
@@ -51,8 +69,8 @@ function transformAgent(agent, { dashboard, history }) {
     sharpeRatio: dashboard.metrics?.sharpeRatio ?? 0,
     totalTrades: dashboard.stats?.totalTrades ?? 0,
     holdings: (dashboard.portfolio?.positions ?? [])
-      .filter(p => p.token !== 'native')
-      .map(p => ({
+      .filter((p) => p.token !== 'native')
+      .map((p) => ({
         symbol: p.symbol,
         name: p.symbol,
         shares: parseFloat(p.balance),
@@ -64,11 +82,9 @@ function transformAgent(agent, { dashboard, history }) {
       })),
   };
 
-  // Trades — from history cycles, flatten all enriched trades
-  const trades = [];
-  const reasoningLogs = [];
+  const trades: Trade[] = [];
+  const reasoningLogs: ReasoningLog[] = [];
 
-  // history is newest-first from the API, reverse for chronological
   const chronological = [...history].reverse();
 
   for (const cycle of chronological) {
@@ -76,17 +92,18 @@ function transformAgent(agent, { dashboard, history }) {
     let hadValidTrade = false;
 
     for (const trade of cycle.trades || []) {
-      // Skip garbage trades (failed, $0, or missing symbols)
       if (trade.amount_usd <= 0 || trade.status === 'failed') continue;
       hadValidTrade = true;
 
       const symbol = trade.type === 'SELL' ? trade.fromSymbol : trade.toSymbol;
       trades.push({
-        type: trade.type,
+        type: trade.type as 'BUY' | 'SELL',
         stock: symbol,
         stockName: symbol,
         sector: '',
-        shares: trade.executed_price ? parseFloat((trade.amount_usd / trade.executed_price).toFixed(6)) : 0,
+        shares: trade.executed_price
+          ? parseFloat((trade.amount_usd / trade.executed_price).toFixed(6))
+          : 0,
         price: trade.executed_price ?? 0,
         value: Math.round(trade.amount_usd * 100) / 100,
         hour,
@@ -101,15 +118,17 @@ function transformAgent(agent, { dashboard, history }) {
       });
     }
 
-    // If cycle has reasoning but no valid trades, still add a reasoning log
     if (!hadValidTrade && cycle.reasoning) {
-      let text;
+      let text: string;
+      const reasoning = cycle.reasoning as Record<string, unknown>;
       if (typeof cycle.reasoning === 'string') {
         text = cycle.reasoning;
-      } else if (typeof cycle.reasoning.marketAnalysis?.overview === 'string') {
-        text = cycle.reasoning.marketAnalysis.overview;
-      } else if (typeof cycle.reasoning.summary === 'string') {
-        text = cycle.reasoning.summary;
+      } else if (
+        typeof (reasoning.marketAnalysis as Record<string, unknown>)?.overview === 'string'
+      ) {
+        text = (reasoning.marketAnalysis as Record<string, unknown>).overview as string;
+      } else if (typeof reasoning.summary === 'string') {
+        text = reasoning.summary as string;
       } else {
         text = JSON.stringify(cycle.reasoning).slice(0, 200);
       }
@@ -121,24 +140,21 @@ function transformAgent(agent, { dashboard, history }) {
     }
   }
 
-  // Portfolio history — build a dense array indexed by hour (0..168)
-  // so components can access portfolioHistory[hour] directly.
-  // Forward-fill from sparse API data points.
-  const sparsePoints = (dashboard.portfolioHistory || []).map(p => ({
+  const sparsePoints = (dashboard.portfolioHistory || []).map((p) => ({
     hour: toHourOffset(p.timestamp, competitionStart),
     value: p.value,
   }));
 
-  const maxHour = sparsePoints.length > 0
-    ? Math.min(168, Math.max(...sparsePoints.map(p => p.hour)))
-    : 0;
+  const maxHour =
+    sparsePoints.length > 0
+      ? Math.min(168, Math.max(...sparsePoints.map((p) => p.hour)))
+      : 0;
 
-  const portfolioHistory = [];
+  const portfolioHistory: PortfolioSnapshot[] = [];
   let lastValue = STARTING_CAPITAL;
   let sparseIdx = 0;
 
   for (let h = 0; h <= maxHour; h++) {
-    // Consume all sparse points at or before this hour
     while (sparseIdx < sparsePoints.length && sparsePoints[sparseIdx].hour <= h) {
       lastValue = sparsePoints[sparseIdx].value;
       sparseIdx++;
@@ -155,41 +171,42 @@ function transformAgent(agent, { dashboard, history }) {
   };
 }
 
-/**
- * Fetch all live agents and return data in the shape App.jsx expects:
- * { agentData, stockPrices, rankings }
- */
-export async function fetchLiveData() {
+export async function GET(): Promise<NextResponse<AgentsResponse>> {
+  const liveAgents = AGENTS.filter((a) => getAgentUrl(a.id));
+
+  if (liveAgents.length === 0) {
+    return NextResponse.json({
+      agentData: {},
+      stockPrices: {},
+      rankings: [],
+      live: false,
+    });
+  }
+
   const results = await Promise.all(
-    LIVE_AGENTS.map(async (agent) => {
+    liveAgents.map(async (agent) => {
       const data = await fetchAgent(agent);
       if (!data) return null;
       return transformAgent(agent, data);
-    })
+    }),
   );
 
-  const agentData = {};
+  const agentData: Record<string, AgentData> = {};
   for (const result of results) {
-    if (result) agentData[result.id] = result;
+    if (result) agentData[result.id] = { ...result, rank: 0 };
   }
 
-  // Rankings — sort by portfolio totalValue descending
   const rankings = Object.values(agentData).sort(
-    (a, b) => b.portfolio.totalValue - a.portfolio.totalValue
+    (a, b) => b.portfolio.totalValue - a.portfolio.totalValue,
   );
   rankings.forEach((agent, i) => {
     agentData[agent.id].rank = i + 1;
   });
 
-  // stockPrices — empty object; TickerBar falls back to static TOKENS prices
-  const stockPrices = {};
-
-  return { agentData, stockPrices, rankings };
-}
-
-/**
- * Check if any agents have API URLs configured.
- */
-export function hasLiveAgents() {
-  return LIVE_AGENTS.length > 0;
+  return NextResponse.json({
+    agentData,
+    stockPrices: {},
+    rankings,
+    live: true,
+  });
 }

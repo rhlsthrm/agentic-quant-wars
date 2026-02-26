@@ -1,24 +1,35 @@
+'use client';
+
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, Area, AreaChart
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
 } from 'recharts';
-import { AGENTS, STARTING_CAPITAL } from '../data/agents';
-import './PerformanceChart.css';
+import { AGENTS, STARTING_CAPITAL } from '@/app/data/agents';
+import type { AgentData } from '@/app/types';
 
-export default function PerformanceChart({ agentData }) {
-  const [activeAgents, setActiveAgents] = useState(() =>
-    AGENTS.filter(a => agentData?.[a.id]).map(a => a.id)
+interface PerformanceChartProps {
+  agentData: Record<string, AgentData>;
+}
+
+export default function PerformanceChart({ agentData }: PerformanceChartProps) {
+  const [activeAgents, setActiveAgents] = useState<string[]>(() =>
+    AGENTS.filter((a) => agentData?.[a.id]).map((a) => a.id),
   );
-  const [chartType, setChartType] = useState('pnl'); // value | pnl | pct
+  const [chartType, setChartType] = useState<'value' | 'pnl' | 'pct'>('pnl');
 
   if (!agentData) return null;
 
-  // Build chart data — sample every 2 hours for performance
-  const chartData = [];
+  const chartData: Record<string, number | string>[] = [];
   for (let hour = 0; hour <= 168; hour += 2) {
-    const point = { hour };
-    AGENTS.forEach(agent => {
+    const point: Record<string, number | string> = { hour };
+    AGENTS.forEach((agent) => {
       const data = agentData[agent.id];
       if (data?.portfolioHistory[hour]) {
         if (chartType === 'value') {
@@ -26,28 +37,30 @@ export default function PerformanceChart({ agentData }) {
         } else if (chartType === 'pnl') {
           point[agent.id] = data.portfolioHistory[hour].value - STARTING_CAPITAL;
         } else {
-          point[agent.id] = ((data.portfolioHistory[hour].value - STARTING_CAPITAL) / STARTING_CAPITAL * 100);
+          point[agent.id] =
+            ((data.portfolioHistory[hour].value - STARTING_CAPITAL) / STARTING_CAPITAL) * 100;
         }
       }
     });
     chartData.push(point);
   }
 
-  const toggleAgent = (id) => {
-    setActiveAgents(prev =>
-      prev.includes(id) ? prev.filter(a => a !== id) : [...prev, id]
+  const toggleAgent = (id: string) => {
+    setActiveAgents((prev) =>
+      prev.includes(id) ? prev.filter((a) => a !== id) : [...prev, id],
     );
   };
 
-  const formatYAxis = (value) => {
+  const formatYAxis = (value: number) => {
     if (chartType === 'pct') return `${value.toFixed(1)}%`;
     if (chartType === 'pnl') return `${value >= 0 ? '+' : ''}$${value.toFixed(0)}`;
     return `$${value.toLocaleString()}`;
   };
 
-  const formatTooltip = (value, name) => {
-    const agent = AGENTS.find(a => a.id === name);
-    const label = agent?.name || name;
+  const formatTooltip = (value: number | undefined, name: string | undefined) => {
+    if (value == null) return ['', ''];
+    const agent = AGENTS.find((a) => a.id === name);
+    const label = agent?.name || name || '';
     if (chartType === 'pct') return [`${value.toFixed(2)}%`, label];
     if (chartType === 'pnl') return [`${value >= 0 ? '+' : ''}$${value.toFixed(2)}`, label];
     return [`$${value.toFixed(2)}`, label];
@@ -63,14 +76,15 @@ export default function PerformanceChart({ agentData }) {
         </p>
       </div>
 
-      {/* Controls */}
       <div className="perf-controls">
         <div className="perf-tabs">
-          {[
-            { id: 'value', label: 'Portfolio Value' },
-            { id: 'pnl', label: 'PnL ($)' },
-            { id: 'pct', label: 'Return (%)' },
-          ].map(tab => (
+          {(
+            [
+              { id: 'value', label: 'Portfolio Value' },
+              { id: 'pnl', label: 'PnL ($)' },
+              { id: 'pct', label: 'Return (%)' },
+            ] as const
+          ).map((tab) => (
             <button
               key={tab.id}
               className={`perf-tab ${chartType === tab.id ? 'active' : ''}`}
@@ -82,19 +96,27 @@ export default function PerformanceChart({ agentData }) {
         </div>
 
         <div className="perf-agent-toggles">
-          {AGENTS.filter(a => agentData?.[a.id]).map(agent => (
+          {AGENTS.filter((a) => agentData?.[a.id]).map((agent) => (
             <button
               key={agent.id}
               className={`agent-toggle ${activeAgents.includes(agent.id) ? 'active' : ''}`}
               onClick={() => toggleAgent(agent.id)}
-              style={{
-                '--toggle-color': agent.color,
-                borderColor: activeAgents.includes(agent.id) ? agent.color : 'var(--border-primary)',
-              }}
+              style={
+                {
+                  '--toggle-color': agent.color,
+                  borderColor: activeAgents.includes(agent.id)
+                    ? agent.color
+                    : 'var(--border-primary)',
+                } as React.CSSProperties
+              }
             >
               <span
                 className="toggle-dot"
-                style={{ background: activeAgents.includes(agent.id) ? agent.color : 'var(--text-tertiary)' }}
+                style={{
+                  background: activeAgents.includes(agent.id)
+                    ? agent.color
+                    : 'var(--text-tertiary)',
+                }}
               />
               {agent.name}
             </button>
@@ -102,7 +124,6 @@ export default function PerformanceChart({ agentData }) {
         </div>
       </div>
 
-      {/* Chart */}
       <motion.div
         className="perf-chart-container"
         initial={{ opacity: 0, y: 20 }}
@@ -120,14 +141,22 @@ export default function PerformanceChart({ agentData }) {
             <XAxis
               dataKey="hour"
               stroke="var(--text-tertiary)"
-              tick={{ fontSize: 10, fontFamily: 'JetBrains Mono', fill: 'var(--text-tertiary)' }}
+              tick={{
+                fontSize: 10,
+                fontFamily: 'JetBrains Mono',
+                fill: 'var(--text-tertiary)',
+              }}
               tickLine={false}
               axisLine={{ stroke: 'var(--border-primary)' }}
-              tickFormatter={v => `${v}h`}
+              tickFormatter={(v) => `${v}h`}
             />
             <YAxis
               stroke="var(--text-tertiary)"
-              tick={{ fontSize: 10, fontFamily: 'JetBrains Mono', fill: 'var(--text-tertiary)' }}
+              tick={{
+                fontSize: 10,
+                fontFamily: 'JetBrains Mono',
+                fill: 'var(--text-tertiary)',
+              }}
               tickLine={false}
               axisLine={false}
               tickFormatter={formatYAxis}
@@ -147,20 +176,20 @@ export default function PerformanceChart({ agentData }) {
               labelFormatter={(label) => `Hour ${label}`}
               labelStyle={{ color: 'var(--text-tertiary)', marginBottom: 6 }}
             />
-            {AGENTS.map(agent => (
-              activeAgents.includes(agent.id) && (
-                <Line
-                  key={agent.id}
-                  type="monotone"
-                  dataKey={agent.id}
-                  stroke={agent.color}
-                  strokeWidth={2}
-                  dot={false}
-                  activeDot={{ r: 4, fill: agent.color, stroke: '#0a0a0c', strokeWidth: 2 }}
-                />
-              )
-            ))}
-            {/* Reference line for starting capital / zero */}
+            {AGENTS.map(
+              (agent) =>
+                activeAgents.includes(agent.id) && (
+                  <Line
+                    key={agent.id}
+                    type="monotone"
+                    dataKey={agent.id}
+                    stroke={agent.color}
+                    strokeWidth={2}
+                    dot={false}
+                    activeDot={{ r: 4, fill: agent.color, stroke: '#0a0a0c', strokeWidth: 2 }}
+                  />
+                ),
+            )}
             {chartType === 'value' && (
               <Line
                 type="monotone"

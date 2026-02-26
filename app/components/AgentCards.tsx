@@ -1,12 +1,19 @@
+'use client';
+
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LineChart, Line, ResponsiveContainer, Tooltip, YAxis } from 'recharts';
-import { Wallet, TrendingUp, BarChart3, Brain, ChevronDown, ChevronUp } from 'lucide-react';
+import { Wallet, Brain, ChevronDown, ChevronUp } from 'lucide-react';
 import { AGENT_LOGOS } from './Logos';
-import './AgentCards.css';
+import type { AgentData } from '@/app/types';
 
-export default function AgentCards({ rankings, agentData }) {
-  const [expandedId, setExpandedId] = useState(null);
+interface AgentCardsProps {
+  rankings: AgentData[];
+  agentData: Record<string, AgentData>;
+}
+
+export default function AgentCards({ rankings }: AgentCardsProps) {
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   if (!rankings) return null;
 
@@ -16,8 +23,8 @@ export default function AgentCards({ rankings, agentData }) {
         <div className="section-label">Agent Profiles</div>
         <h2 className="section-title">Meet the Agents</h2>
         <p className="section-subtitle">
-          Each agent starts with $2,000 in USDC, provisioned via Phantom MCP,
-          trading crypto assets via LI.FI
+          Each agent starts with $2,000 in USDC, provisioned via Phantom MCP, trading crypto
+          assets via LI.FI
         </p>
       </div>
 
@@ -34,16 +41,16 @@ export default function AgentCards({ rankings, agentData }) {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: i * 0.08 }}
-              style={{ '--agent-color': agent.color }}
+              style={{ '--agent-color': agent.color } as React.CSSProperties}
             >
-              {/* Card header */}
               <div className="ac-header">
                 <div className="ac-rank">#{agent.rank}</div>
-                <div
-                  className="ac-avatar"
-                  style={{ background: `${agent.color}18` }}
-                >
-                  {AGENT_LOGOS[agent.id] && (() => { const Logo = AGENT_LOGOS[agent.id]; return <Logo size={22} />; })()}
+                <div className="ac-avatar" style={{ background: `${agent.color}18` }}>
+                  {AGENT_LOGOS[agent.id] &&
+                    (() => {
+                      const Logo = AGENT_LOGOS[agent.id];
+                      return <Logo size={22} />;
+                    })()}
                 </div>
                 <div className="ac-identity">
                   <h3 className="ac-name">{agent.name}</h3>
@@ -51,13 +58,11 @@ export default function AgentCards({ rankings, agentData }) {
                 </div>
               </div>
 
-              {/* Strategy */}
               <div className="ac-strategy">
                 <Brain size={12} />
                 <span>{agent.strategy}</span>
               </div>
 
-              {/* Performance chart */}
               <div className="ac-chart">
                 <ResponsiveContainer width="100%" height={80}>
                   <LineChart data={data}>
@@ -71,8 +76,11 @@ export default function AgentCards({ rankings, agentData }) {
                         fontFamily: 'JetBrains Mono',
                         color: '#e8e6e3',
                       }}
-                      formatter={(value) => [`$${value.toFixed(2)}`, 'Value']}
-                      labelFormatter={(label) => `Hour ${label * 4}`}
+                      formatter={(value: number | undefined) => [
+                        value != null ? `$${value.toFixed(2)}` : '',
+                        'Value',
+                      ]}
+                      labelFormatter={(label) => `Hour ${Number(label) * 4}`}
                     />
                     <Line
                       type="monotone"
@@ -86,18 +94,21 @@ export default function AgentCards({ rankings, agentData }) {
                 </ResponsiveContainer>
               </div>
 
-              {/* Key metrics */}
               <div className="ac-metrics">
                 <div className="ac-metric">
                   <span className="ac-metric-label">Portfolio</span>
                   <span className="ac-metric-value">
-                    ${agent.portfolio.totalValue.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    $
+                    {agent.portfolio.totalValue.toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                    })}
                   </span>
                 </div>
                 <div className="ac-metric">
                   <span className="ac-metric-label">PnL</span>
                   <span className={`ac-metric-value ${isProfit ? 'profit' : 'loss'}`}>
-                    {isProfit ? '+' : ''}{agent.portfolio.pnlPct}%
+                    {isProfit ? '+' : ''}
+                    {agent.portfolio.pnlPct}%
                   </span>
                 </div>
                 <div className="ac-metric">
@@ -110,7 +121,6 @@ export default function AgentCards({ rankings, agentData }) {
                 </div>
               </div>
 
-              {/* Expand toggle */}
               <button
                 className="ac-expand"
                 onClick={() => setExpandedId(isExpanded ? null : agent.id)}
@@ -119,7 +129,6 @@ export default function AgentCards({ rankings, agentData }) {
                 {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
               </button>
 
-              {/* Expanded holdings */}
               <AnimatePresence>
                 {isExpanded && (
                   <motion.div
@@ -142,7 +151,8 @@ export default function AgentCards({ rankings, agentData }) {
                           <span className="holding-shares">{h.shares}</span>
                           <span className="holding-value">${h.value.toLocaleString()}</span>
                           <span className={`holding-pnl ${h.pnl >= 0 ? 'profit' : 'loss'}`}>
-                            {h.pnl >= 0 ? '+' : ''}{h.pnlPct}%
+                            {h.pnl >= 0 ? '+' : ''}
+                            {h.pnlPct}%
                           </span>
                         </div>
                       ))
@@ -151,7 +161,10 @@ export default function AgentCards({ rankings, agentData }) {
                     )}
                     <div className="holdings-cash">
                       <Wallet size={12} />
-                      Cash: ${agent.portfolio.cash.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                      Cash: $
+                      {agent.portfolio.cash.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                      })}
                     </div>
                   </motion.div>
                 )}

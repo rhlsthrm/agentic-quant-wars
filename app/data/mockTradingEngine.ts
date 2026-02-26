@@ -1,10 +1,7 @@
-// Mock Crypto Trading Engine
-// Generates realistic trading data for each AI agent
-
+import type { AgentData, Trade, ReasoningLog, PortfolioSnapshot, Holding } from '@/app/types';
 import { AGENTS, STOCKS, STARTING_CAPITAL } from './agents';
 
-// Seed-based pseudo-random for reproducible but varied results
-function seededRandom(seed) {
+function seededRandom(seed: number): () => number {
   let s = seed;
   return () => {
     s = (s * 16807 + 0) % 2147483647;
@@ -12,14 +9,13 @@ function seededRandom(seed) {
   };
 }
 
-// Generate price history with realistic crypto volatility
-function generatePriceMovement(basePrice, hours, seed) {
+function generatePriceMovement(basePrice: number, hours: number, seed: number): number[] {
   const rng = seededRandom(seed);
   const prices = [basePrice];
   let price = basePrice;
 
   for (let i = 1; i <= hours; i++) {
-    const volatility = 0.003 + rng() * 0.015; // higher crypto vol
+    const volatility = 0.003 + rng() * 0.015;
     const drift = (rng() - 0.48) * volatility;
     price = price * (1 + drift);
     price = Math.max(price * 0.7, Math.min(price * 1.3, price));
@@ -28,17 +24,23 @@ function generatePriceMovement(basePrice, hours, seed) {
   return prices;
 }
 
-// Generate token prices over competition period
-export function generateStockPrices() {
-  const stockPrices = {};
+export function generateStockPrices(): Record<string, number[]> {
+  const stockPrices: Record<string, number[]> = {};
   STOCKS.forEach((stock, i) => {
     stockPrices[stock.symbol] = generatePriceMovement(stock.price, 168, (i + 1) * 7919);
   });
   return stockPrices;
 }
 
-// Agent trading strategies produce different portfolio behaviors
-const STRATEGY_PROFILES = {
+interface StrategyProfile {
+  tradeFrequency: number;
+  maxPositionPct: number;
+  riskTolerance: number;
+  preferredSectors: string[];
+  holdDuration: [number, number];
+}
+
+const STRATEGY_PROFILES: Record<string, StrategyProfile> = {
   gpt: {
     tradeFrequency: 0.35,
     maxPositionPct: 0.3,
@@ -76,8 +78,7 @@ const STRATEGY_PROFILES = {
   },
 };
 
-// Reasoning templates for each agent
-const REASONING_TEMPLATES = {
+const REASONING_TEMPLATES: Record<string, string[]> = {
   gpt: [
     'Detected bullish momentum in {stock} based on 4hr moving average crossover. Entry at ${price}.',
     'Onchain metrics suggest accumulation in {sector} sector. Allocating {pct}% to {stock}.',
@@ -115,8 +116,35 @@ const REASONING_TEMPLATES = {
   ],
 };
 
-// Generate a trade action
-function generateTrade(agentId, hour, rng, stockPrices, portfolio) {
+interface SimHolding {
+  shares: number;
+  avgCost: number;
+}
+
+interface SimPortfolio {
+  cash: number;
+  holdings: Record<string, SimHolding>;
+  totalValue: number;
+}
+
+interface RawTrade {
+  type: 'BUY' | 'SELL';
+  stock: string;
+  stockName: string;
+  sector: string;
+  shares: number;
+  price: number;
+  value: number;
+  hour: number;
+}
+
+function generateTrade(
+  agentId: string,
+  hour: number,
+  rng: () => number,
+  stockPrices: Record<string, number[]>,
+  portfolio: SimPortfolio,
+): RawTrade | null {
   const profile = STRATEGY_PROFILES[agentId];
   if (rng() > profile.tradeFrequency) return null;
 
@@ -125,7 +153,6 @@ function generateTrade(agentId, hour, rng, stockPrices, portfolio) {
   const stock = STOCKS[stockIdx];
   const currentPrice = stockPrices[stock.symbol][hour];
 
-  // Prefer certain sectors
   const sectorBonus = profile.preferredSectors.includes(stock.sector) ? 0.3 : 0;
   if (rng() > 0.5 + sectorBonus) return null;
 
@@ -134,7 +161,8 @@ function generateTrade(agentId, hour, rng, stockPrices, portfolio) {
 
   if (isBuy && cashAvailable < 50) return null;
 
-  let shares, value;
+  let shares: number;
+  let value: number;
   if (isBuy) {
     value = Math.min(maxTradeValue, 80 + rng() * 400);
     shares = parseFloat((value / currentPrice).toFixed(6));
@@ -158,8 +186,7 @@ function generateTrade(agentId, hour, rng, stockPrices, portfolio) {
   };
 }
 
-// Generate reasoning log
-function generateReasoning(agentId, trade, rng) {
+function generateReasoning(agentId: string, trade: RawTrade, rng: () => number): string {
   const templates = REASONING_TEMPLATES[agentId];
   const template = templates[Math.floor(rng() * templates.length)];
 
@@ -167,31 +194,36 @@ function generateReasoning(agentId, trade, rng) {
     .replace('{stock}', trade.stock)
     .replace('{sector}', trade.sector)
     .replace('{price}', trade.price.toFixed(2))
-    .replace('{pct}', Math.floor(10 + rng() * 30))
-    .replace('{val}', Math.floor(55 + rng() * 40));
+    .replace('{pct}', String(Math.floor(10 + rng() * 30)))
+    .replace('{val}', String(Math.floor(55 + rng() * 40)));
 }
 
-// Run the full simulation
-export function runSimulation() {
-  const stockPrices = generateStockPrices();
+export interface SimulationResult {
+  agentData: Record<string, AgentData>;
+  stockPrices: Record<string, number[]>;
+  rankings: AgentData[];
+}
 
-  const agentData = {};
+export function runSimulation(): SimulationResult {
+  const stockPrices = generateStockPrices();
+  const agentData: Record<string, AgentData> = {};
 
   AGENTS.forEach((agent) => {
     const rng = seededRandom(agent.id.charCodeAt(0) * 31337);
 
-    const portfolio = {
+    const portfolio: SimPortfolio = {
       cash: STARTING_CAPITAL,
       holdings: {},
       totalValue: STARTING_CAPITAL,
     };
 
-    const trades = [];
-    const reasoningLogs = [];
-    const portfolioHistory = [{ hour: 0, value: STARTING_CAPITAL, cash: STARTING_CAPITAL }];
+    const trades: Trade[] = [];
+    const reasoningLogs: ReasoningLog[] = [];
+    const portfolioHistory: PortfolioSnapshot[] = [
+      { hour: 0, value: STARTING_CAPITAL, cash: STARTING_CAPITAL },
+    ];
 
     for (let hour = 1; hour <= 168; hour++) {
-      // Execute trades
       const trade = generateTrade(agent.id, hour, rng, stockPrices, portfolio);
 
       if (trade) {
@@ -221,7 +253,6 @@ export function runSimulation() {
         });
       }
 
-      // Calculate total portfolio value
       let holdingsValue = 0;
       Object.entries(portfolio.holdings).forEach(([symbol, holding]) => {
         holdingsValue += holding.shares * stockPrices[symbol][hour];
@@ -235,12 +266,10 @@ export function runSimulation() {
       });
     }
 
-    // Calculate final metrics
     const finalValue = portfolio.totalValue;
     const pnl = finalValue - STARTING_CAPITAL;
-    const pnlPct = ((pnl / STARTING_CAPITAL) * 100).toFixed(2);
+    const pnlPct = parseFloat(((pnl / STARTING_CAPITAL) * 100).toFixed(2));
 
-    // Calculate max drawdown
     let peak = STARTING_CAPITAL;
     let maxDrawdown = 0;
     portfolioHistory.forEach((p) => {
@@ -249,46 +278,48 @@ export function runSimulation() {
       if (drawdown > maxDrawdown) maxDrawdown = drawdown;
     });
 
-    // Calculate Sharpe-like ratio (simplified)
-    const returns = [];
+    const returns: number[] = [];
     for (let i = 1; i < portfolioHistory.length; i++) {
       returns.push(
-        (portfolioHistory[i].value - portfolioHistory[i - 1].value) / portfolioHistory[i - 1].value
+        (portfolioHistory[i].value - portfolioHistory[i - 1].value) /
+          portfolioHistory[i - 1].value,
       );
     }
     const avgReturn = returns.reduce((a, b) => a + b, 0) / returns.length;
     const stdDev = Math.sqrt(
-      returns.reduce((sum, r) => sum + Math.pow(r - avgReturn, 2), 0) / returns.length
+      returns.reduce((sum, r) => sum + Math.pow(r - avgReturn, 2), 0) / returns.length,
     );
-    const sharpeRatio = stdDev > 0 ? ((avgReturn / stdDev) * Math.sqrt(168)).toFixed(2) : '0.00';
+    const sharpeRatio = stdDev > 0 ? parseFloat((avgReturn / stdDev * Math.sqrt(168)).toFixed(2)) : 0;
 
-    // Current holdings breakdown
-    const currentHoldings = Object.entries(portfolio.holdings).map(([symbol, holding]) => {
-      const currentPrice = stockPrices[symbol][168];
-      const value = holding.shares * currentPrice;
-      const costBasis = holding.shares * holding.avgCost;
-      const holdingPnl = value - costBasis;
-      return {
-        symbol,
-        name: STOCKS.find((s) => s.symbol === symbol)?.name || symbol,
-        shares: parseFloat(holding.shares.toFixed(6)),
-        avgCost: parseFloat(holding.avgCost.toFixed(2)),
-        currentPrice: parseFloat(currentPrice.toFixed(2)),
-        value: parseFloat(value.toFixed(2)),
-        pnl: parseFloat(holdingPnl.toFixed(2)),
-        pnlPct: parseFloat(((holdingPnl / costBasis) * 100).toFixed(2)),
-      };
-    });
+    const currentHoldings: Holding[] = Object.entries(portfolio.holdings).map(
+      ([symbol, holding]) => {
+        const currentPrice = stockPrices[symbol][168];
+        const value = holding.shares * currentPrice;
+        const costBasis = holding.shares * holding.avgCost;
+        const holdingPnl = value - costBasis;
+        return {
+          symbol,
+          name: STOCKS.find((s) => s.symbol === symbol)?.name || symbol,
+          shares: parseFloat(holding.shares.toFixed(6)),
+          avgCost: parseFloat(holding.avgCost.toFixed(2)),
+          currentPrice: parseFloat(currentPrice.toFixed(2)),
+          value: parseFloat(value.toFixed(2)),
+          pnl: parseFloat(holdingPnl.toFixed(2)),
+          pnlPct: parseFloat(((holdingPnl / costBasis) * 100).toFixed(2)),
+        };
+      },
+    );
 
     agentData[agent.id] = {
       ...agent,
+      rank: 0,
       portfolio: {
         cash: parseFloat(portfolio.cash.toFixed(2)),
         totalValue: finalValue,
         pnl: parseFloat(pnl.toFixed(2)),
-        pnlPct: parseFloat(pnlPct),
+        pnlPct,
         maxDrawdown: parseFloat(maxDrawdown.toFixed(2)),
-        sharpeRatio: parseFloat(sharpeRatio),
+        sharpeRatio,
         totalTrades: trades.length,
         holdings: currentHoldings,
       },
@@ -298,9 +329,8 @@ export function runSimulation() {
     };
   });
 
-  // Sort by final value for rankings
   const rankings = Object.values(agentData).sort(
-    (a, b) => b.portfolio.totalValue - a.portfolio.totalValue
+    (a, b) => b.portfolio.totalValue - a.portfolio.totalValue,
   );
   rankings.forEach((agent, i) => {
     agentData[agent.id].rank = i + 1;

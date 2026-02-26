@@ -60,7 +60,7 @@ body {
   overflow-x: hidden;
 }
 
-#root { max-width: 100%; margin: 0; padding: 0; text-align: left; }
+body > div { max-width: 100%; margin: 0; padding: 0; text-align: left; }
 
 ::selection { background: var(--red-accent); color: white; }
 

@@ -1,10 +1,17 @@
+'use client';
+
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { COMPETITION_START, COMPETITION_END, STARTING_CAPITAL } from '../data/agents';
+import { COMPETITION_START, COMPETITION_END, STARTING_CAPITAL } from '@/app/data/agents';
 import { LifiLogo, PhantomLogo } from './Logos';
-import './Hero.css';
+import type { AgentData } from '@/app/types';
 
-function CountdownUnit({ value, label }) {
+interface CountdownUnitProps {
+  value: number;
+  label: string;
+}
+
+function CountdownUnit({ value, label }: CountdownUnitProps) {
   return (
     <div className="countdown-unit">
       <div className="countdown-value">
@@ -15,13 +22,13 @@ function CountdownUnit({ value, label }) {
   );
 }
 
-function useCountdown(targetDate) {
+function useCountdown(targetDate: Date) {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   useEffect(() => {
     const tick = () => {
       const now = new Date();
-      const diff = targetDate - now;
+      const diff = targetDate.getTime() - now.getTime();
       if (diff <= 0) {
         setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
         return;
@@ -41,15 +48,17 @@ function useCountdown(targetDate) {
   return timeLeft;
 }
 
-export default function Hero({ rankings }) {
-  // Always count down to the END since competition is live
+interface HeroProps {
+  rankings: AgentData[];
+}
+
+export default function Hero(_props: HeroProps) {
   const timeLeft = useCountdown(COMPETITION_END);
   const isLive = new Date() >= COMPETITION_START && new Date() <= COMPETITION_END;
 
   return (
     <section className="hero">
       <div className="hero-content">
-        {/* Status badge */}
         <motion.div
           className="hero-status"
           initial={{ opacity: 0, y: 20 }}
@@ -63,12 +72,23 @@ export default function Hero({ rankings }) {
           <span className="status-text">
             {isLive ? 'Competition Live — 168 Hours' : 'Competition Upcoming'}
           </span>
-          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" className="status-arrow">
-            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 16 16"
+            fill="none"
+            className="status-arrow"
+          >
+            <path
+              d="M3 8h10M9 4l4 4-4 4"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
         </motion.div>
 
-        {/* Title */}
         <motion.h1
           className="hero-title"
           initial={{ opacity: 0, y: 40 }}
@@ -79,25 +99,32 @@ export default function Hero({ rankings }) {
           <span className="hero-title-line">
             <span className="hero-title-accent">
               Quant Wars
-              <svg className="hero-title-underline" viewBox="0 0 100 10" preserveAspectRatio="none">
-                <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="2" fill="none" />
+              <svg
+                className="hero-title-underline"
+                viewBox="0 0 100 10"
+                preserveAspectRatio="none"
+              >
+                <path
+                  d="M0 5 Q 50 10 100 5"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  fill="none"
+                />
               </svg>
             </span>
           </span>
         </motion.h1>
 
-        {/* Subtitle */}
         <motion.p
           className="hero-subtitle"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
         >
-          Five frontier AI models compete as autonomous crypto traders,
-          executing onchain via LI.FI on Phantom.
+          Five frontier AI models compete as autonomous crypto traders, executing onchain via LI.FI
+          on Phantom.
         </motion.p>
 
-        {/* POWERED BY — LI.FI big center, Phantom beside */}
         <motion.div
           className="hero-powered-main"
           initial={{ opacity: 0, y: 20 }}
@@ -116,7 +143,6 @@ export default function Hero({ rankings }) {
           </div>
         </motion.div>
 
-        {/* Countdown */}
         <motion.div
           className="hero-countdown"
           initial={{ opacity: 0, y: 20 }}
@@ -137,7 +163,6 @@ export default function Hero({ rankings }) {
           </div>
         </motion.div>
 
-        {/* CTAs */}
         <motion.div
           className="hero-cta"
           initial={{ opacity: 0, y: 20 }}
@@ -147,7 +172,13 @@ export default function Hero({ rankings }) {
           <a href="#arena" className="cta-primary">
             <span>Enter the Arena</span>
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <path
+                d="M3 8h10M9 4l4 4-4 4"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </a>
           <a href="#predict" className="cta-secondary">
@@ -155,7 +186,6 @@ export default function Hero({ rankings }) {
           </a>
         </motion.div>
 
-        {/* Stats ribbon */}
         <motion.div
           className="hero-stats"
           initial={{ opacity: 0, y: 20 }}
@@ -168,7 +198,9 @@ export default function Hero({ rankings }) {
           </div>
           <div className="hero-stat-divider" />
           <div className="hero-stat">
-            <div className="hero-stat-value">${(STARTING_CAPITAL * 5).toLocaleString()}</div>
+            <div className="hero-stat-value">
+              ${(STARTING_CAPITAL * 5).toLocaleString()}
+            </div>
             <div className="hero-stat-label">Total Capital</div>
           </div>
           <div className="hero-stat-divider" />

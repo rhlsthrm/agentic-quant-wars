@@ -1,19 +1,32 @@
+'use client';
+
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUpRight, ArrowDownRight, Zap } from 'lucide-react';
-import { AGENTS } from '../data/agents';
-import './TradeFeed.css';
+import { AGENTS } from '@/app/data/agents';
+import type { AgentData, Trade } from '@/app/types';
 
-export default function TradeFeed({ agentData }) {
-  const [visibleTrades, setVisibleTrades] = useState([]);
-  const feedRef = useRef(null);
+interface FeedTrade extends Trade {
+  agentId: string;
+  agentName: string;
+  agentColor: string;
+  agentAvatar: string;
+  key: string;
+}
+
+interface TradeFeedProps {
+  agentData: Record<string, AgentData>;
+}
+
+export default function TradeFeed({ agentData }: TradeFeedProps) {
+  const [visibleTrades, setVisibleTrades] = useState<FeedTrade[]>([]);
+  const feedRef = useRef<HTMLDivElement>(null);
   const keyCounter = useRef(0);
 
-  // Collect all trades from all agents, sorted by hour
-  const allTrades = [];
+  const allTrades: Omit<FeedTrade, 'key'>[] = [];
   if (agentData) {
-    Object.values(agentData).forEach(agent => {
-      agent.trades.forEach(trade => {
+    Object.values(agentData).forEach((agent) => {
+      agent.trades.forEach((trade) => {
         allTrades.push({
           ...trade,
           agentId: agent.id,
@@ -26,19 +39,19 @@ export default function TradeFeed({ agentData }) {
     allTrades.sort((a, b) => a.hour - b.hour);
   }
 
-  // Simulate live feed
   useEffect(() => {
     if (allTrades.length === 0) return;
 
-    // Show last 20 trades initially, each with a unique key
-    const initial = allTrades.slice(-20).map((t) => ({ ...t, key: `t-${++keyCounter.current}` }));
+    const initial = allTrades
+      .slice(-20)
+      .map((t) => ({ ...t, key: `t-${++keyCounter.current}` }));
     setVisibleTrades(initial);
     let idx = Math.max(0, allTrades.length - 20);
 
     const interval = setInterval(() => {
       idx = (idx + 1) % allTrades.length;
       const trade = { ...allTrades[idx], key: `t-${++keyCounter.current}` };
-      setVisibleTrades(current => [...current.slice(-24), trade]);
+      setVisibleTrades((current) => [...current.slice(-24), trade]);
     }, 2500);
 
     return () => clearInterval(interval);
@@ -55,14 +68,12 @@ export default function TradeFeed({ agentData }) {
       </div>
 
       <div className="feed-container">
-        {/* Live indicator */}
         <div className="feed-live-bar">
           <Zap size={12} />
           <span>LIVE TRADE FEED</span>
           <span className="feed-dot-pulse" />
         </div>
 
-        {/* Feed */}
         <div className="feed-list" ref={feedRef}>
           <AnimatePresence initial={false}>
             {visibleTrades.map((trade) => (
@@ -103,9 +114,8 @@ export default function TradeFeed({ agentData }) {
           </AnimatePresence>
         </div>
 
-        {/* Trade stats bar */}
         <div className="feed-stats">
-          {AGENTS.map(agent => {
+          {AGENTS.map((agent) => {
             const data = agentData?.[agent.id];
             if (!data) return null;
             return (

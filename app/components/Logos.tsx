@@ -1,8 +1,9 @@
-// Partner logos + AI Agent logos as image components
+interface LogoProps {
+  size?: number;
+  className?: string;
+}
 
-// ===== PARTNER LOGOS (using actual image files) =====
-
-export function LifiLogo({ size = 24, className = '' }) {
+export function LifiLogo({ size = 24, className = '' }: LogoProps) {
   return (
     <img
       src="/logos/lifi.svg"
@@ -14,7 +15,7 @@ export function LifiLogo({ size = 24, className = '' }) {
   );
 }
 
-export function PhantomLogo({ size = 24, className = '' }) {
+export function PhantomLogo({ size = 24, className = '' }: LogoProps) {
   return (
     <img
       src="/logos/phantom.png"
@@ -26,9 +27,7 @@ export function PhantomLogo({ size = 24, className = '' }) {
   );
 }
 
-// ===== AI AGENT LOGOS (using actual image files) =====
-
-export function OpenAILogo({ size = 32, className = '' }) {
+export function OpenAILogo({ size = 32, className = '' }: LogoProps) {
   return (
     <img
       src="/logos/openai.webp"
@@ -41,7 +40,7 @@ export function OpenAILogo({ size = 32, className = '' }) {
   );
 }
 
-export function ClaudeLogo({ size = 32, className = '' }) {
+export function ClaudeLogo({ size = 32, className = '' }: LogoProps) {
   return (
     <img
       src="/logos/claude.png"
@@ -54,7 +53,7 @@ export function ClaudeLogo({ size = 32, className = '' }) {
   );
 }
 
-export function GeminiLogo({ size = 32, className = '' }) {
+export function GeminiLogo({ size = 32, className = '' }: LogoProps) {
   return (
     <img
       src="/logos/gemini.png"
@@ -67,7 +66,7 @@ export function GeminiLogo({ size = 32, className = '' }) {
   );
 }
 
-export function GrokLogo({ size = 32, className = '' }) {
+export function GrokLogo({ size = 32, className = '' }: LogoProps) {
   return (
     <img
       src="/logos/grok.webp"
@@ -80,7 +79,7 @@ export function GrokLogo({ size = 32, className = '' }) {
   );
 }
 
-export function DeepSeekLogo({ size = 32, className = '' }) {
+export function DeepSeekLogo({ size = 32, className = '' }: LogoProps) {
   return (
     <img
       src="/logos/deepseek.png"
@@ -93,8 +92,7 @@ export function DeepSeekLogo({ size = 32, className = '' }) {
   );
 }
 
-// Map agent IDs to their logo components
-export const AGENT_LOGOS = {
+export const AGENT_LOGOS: Record<string, React.ComponentType<LogoProps>> = {
   gpt: OpenAILogo,
   claude: ClaudeLogo,
   gemini: GeminiLogo,
