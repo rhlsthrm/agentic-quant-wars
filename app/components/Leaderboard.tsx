@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { Trophy, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { AGENT_LOGOS } from './Logos';
+import { AGENTS } from '@/app/data/agents';
 import type { AgentData, PortfolioSnapshot } from '@/app/types';
 
 interface LeaderboardProps {
@@ -10,19 +11,40 @@ interface LeaderboardProps {
 }
 
 export default function Leaderboard({ rankings }: LeaderboardProps) {
-  if (!rankings || rankings.length === 0) return null;
+  const hasRankings = rankings && rankings.length > 0;
+  const displayRankings: AgentData[] = hasRankings
+    ? rankings
+    : AGENTS.map((agent, i) => ({
+        ...agent,
+        rank: i + 1,
+        portfolio: {
+          cash: 0,
+          totalValue: 0,
+          pnl: 0,
+          pnlPct: 0,
+          maxDrawdown: 0,
+          sharpeRatio: 0,
+          totalTrades: 0,
+          holdings: [],
+        },
+        trades: [],
+        reasoningLogs: [],
+        portfolioHistory: [],
+      }));
 
   return (
     <section id="arena" className="leaderboard-section section section-gap">
       <div className="section-header">
-        <div className="section-label">Live Rankings</div>
+        <div className="section-label">{hasRankings ? 'Live Rankings' : 'Starting Lineup'}</div>
         <h2 className="section-title">The Arena</h2>
         <p className="section-subtitle">
-          Real-time performance of five autonomous AI crypto traders
+          {hasRankings
+            ? 'Real-time performance of five autonomous AI crypto traders'
+            : 'Five autonomous AI crypto traders ready to compete'}
         </p>
       </div>
 
-      <div className="leaderboard">
+      <div className={`leaderboard ${!hasRankings ? 'leaderboard-pending' : ''}`}>
         <div className="lb-header">
           <div className="lb-col lb-rank">Rank</div>
           <div className="lb-col lb-agent">Agent</div>
@@ -35,22 +57,22 @@ export default function Leaderboard({ rankings }: LeaderboardProps) {
           <div className="lb-col lb-chart">24h Trend</div>
         </div>
 
-        {rankings.map((agent, i) => {
+        {displayRankings.map((agent, i) => {
           const isProfit = agent.portfolio.pnl >= 0;
           const isFirst = i === 0;
 
           return (
             <motion.div
               key={agent.id}
-              className={`lb-row ${isFirst ? 'lb-row-leader' : ''}`}
+              className={`lb-row ${hasRankings && isFirst ? 'lb-row-leader' : ''}`}
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: i * 0.1 }}
             >
               <div className="lb-col lb-rank">
-                <span className={`rank-badge rank-${i + 1}`}>
-                  {i === 0 && <Trophy size={12} />}
-                  {agent.rank}
+                <span className={`rank-badge ${hasRankings ? `rank-${i + 1}` : ''}`}>
+                  {hasRankings && i === 0 && <Trophy size={12} />}
+                  {hasRankings ? agent.rank : '—'}
                 </span>
               </div>
 
@@ -70,37 +92,50 @@ export default function Leaderboard({ rankings }: LeaderboardProps) {
 
               <div className="lb-col lb-value">
                 <span className="value-main">
-                  $
-                  {agent.portfolio.totalValue.toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                  })}
+                  {hasRankings
+                    ? `$${agent.portfolio.totalValue.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
+                    : '—'}
                 </span>
               </div>
 
-              <div className={`lb-col lb-pnl ${isProfit ? 'profit' : 'loss'}`}>
-                <span className="pnl-icon">
-                  {isProfit ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
-                </span>
-                {isProfit ? '+' : '-'}$
-                {Math.abs(agent.portfolio.pnl).toLocaleString(undefined, {
-                  minimumFractionDigits: 2,
-                })}
+              <div className={`lb-col lb-pnl ${hasRankings ? (isProfit ? 'profit' : 'loss') : ''}`}>
+                {hasRankings ? (
+                  <>
+                    <span className="pnl-icon">
+                      {isProfit ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
+                    </span>
+                    {isProfit ? '+' : '-'}$
+                    {Math.abs(agent.portfolio.pnl).toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                    })}
+                  </>
+                ) : '—'}
               </div>
 
-              <div className={`lb-col lb-pnl-pct ${isProfit ? 'profit' : 'loss'}`}>
-                {isProfit ? '+' : ''}
-                {agent.portfolio.pnlPct}%
+              <div className={`lb-col lb-pnl-pct ${hasRankings ? (isProfit ? 'profit' : 'loss') : ''}`}>
+                {hasRankings ? (
+                  <>
+                    {isProfit ? '+' : ''}
+                    {agent.portfolio.pnlPct}%
+                  </>
+                ) : '—'}
               </div>
 
               <div className="lb-col lb-sharpe">
-                <span className={agent.portfolio.sharpeRatio > 0.5 ? 'good-sharpe' : ''}>
-                  {agent.portfolio.sharpeRatio}
-                </span>
+                {hasRankings ? (
+                  <span className={agent.portfolio.sharpeRatio > 0.5 ? 'good-sharpe' : ''}>
+                    {agent.portfolio.sharpeRatio}
+                  </span>
+                ) : '—'}
               </div>
 
-              <div className="lb-col lb-drawdown">-{agent.portfolio.maxDrawdown}%</div>
+              <div className="lb-col lb-drawdown">
+                {hasRankings ? `-${agent.portfolio.maxDrawdown}%` : '—'}
+              </div>
 
-              <div className="lb-col lb-trades">{agent.portfolio.totalTrades}</div>
+              <div className="lb-col lb-trades">
+                {hasRankings ? agent.portfolio.totalTrades : '—'}
+              </div>
 
               <div className="lb-col lb-chart">
                 <MiniChart data={agent.portfolioHistory.slice(-24)} color={agent.color} />
@@ -109,6 +144,19 @@ export default function Leaderboard({ rankings }: LeaderboardProps) {
           );
         })}
       </div>
+
+      {!hasRankings && (
+        <div style={{
+          textAlign: 'center',
+          padding: '16px',
+          fontFamily: 'var(--font-mono)',
+          fontSize: '12px',
+          color: 'var(--text-tertiary)',
+          letterSpacing: '1px',
+        }}>
+          WAITING FOR COMPETITION TO BEGIN
+        </div>
+      )}
 
       <div className="lb-legend">
         <span className="lb-legend-item">

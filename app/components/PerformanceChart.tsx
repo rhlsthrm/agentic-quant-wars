@@ -26,13 +26,13 @@ export default function PerformanceChart({ agentData, durationHours, startingCap
   );
   const [chartType, setChartType] = useState<'value' | 'pnl' | 'pct'>('pnl');
 
-  if (!agentData) return null;
+  const hasAgentData = agentData && Object.keys(agentData).length > 0;
 
   const chartData: Record<string, number | string>[] = [];
   for (let hour = 0; hour <= durationHours; hour += 2) {
     const point: Record<string, number | string> = { hour };
     AGENTS.forEach((agent) => {
-      const data = agentData[agent.id];
+      const data = agentData?.[agent.id];
       if (data?.portfolioHistory[hour]) {
         if (chartType === 'value') {
           point[agent.id] = data.portfolioHistory[hour].value;
@@ -98,11 +98,12 @@ export default function PerformanceChart({ agentData, durationHours, startingCap
         </div>
 
         <div className="perf-agent-toggles">
-          {AGENTS.filter((a) => agentData?.[a.id]).map((agent) => (
+          {(hasAgentData ? AGENTS.filter((a) => agentData?.[a.id]) : AGENTS).map((agent) => (
             <button
               key={agent.id}
               className={`agent-toggle ${activeAgents.includes(agent.id) ? 'active' : ''}`}
-              onClick={() => toggleAgent(agent.id)}
+              disabled={!hasAgentData}
+              onClick={() => hasAgentData && toggleAgent(agent.id)}
               style={
                 {
                   '--toggle-color': agent.color,
@@ -126,99 +127,117 @@ export default function PerformanceChart({ agentData, durationHours, startingCap
         </div>
       </div>
 
-      <motion.div
-        className="perf-chart-container"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <ResponsiveContainer width="100%" height={420}>
-          <LineChart data={chartData} margin={{ top: 10, right: 30, left: 20, bottom: 10 }}>
-            <CartesianGrid
-              strokeDasharray="3 3"
-              stroke="var(--border-primary)"
-              horizontal
-              vertical={false}
-            />
-            <XAxis
-              dataKey="hour"
-              stroke="var(--text-tertiary)"
-              tick={{
-                fontSize: 10,
-                fontFamily: 'JetBrains Mono',
-                fill: 'var(--text-tertiary)',
-              }}
-              tickLine={false}
-              axisLine={{ stroke: 'var(--border-primary)' }}
-              tickFormatter={(v) => `${v}h`}
-            />
-            <YAxis
-              stroke="var(--text-tertiary)"
-              tick={{
-                fontSize: 10,
-                fontFamily: 'JetBrains Mono',
-                fill: 'var(--text-tertiary)',
-              }}
-              tickLine={false}
-              axisLine={false}
-              tickFormatter={formatYAxis}
-              width={70}
-            />
-            <Tooltip
-              contentStyle={{
-                background: '#16171d',
-                border: '1px solid #282a35',
-                borderRadius: '8px',
-                fontSize: '11px',
-                fontFamily: 'JetBrains Mono',
-                color: '#e8e6e3',
-                padding: '12px',
-              }}
-              formatter={formatTooltip}
-              labelFormatter={(label) => `Hour ${label}`}
-              labelStyle={{ color: 'var(--text-tertiary)', marginBottom: 6 }}
-            />
-            {AGENTS.map(
-              (agent) =>
-                activeAgents.includes(agent.id) && (
-                  <Line
-                    key={agent.id}
-                    type="monotone"
-                    dataKey={agent.id}
-                    stroke={agent.color}
-                    strokeWidth={2}
-                    dot={false}
-                    activeDot={{ r: 4, fill: agent.color, stroke: '#0a0a0c', strokeWidth: 2 }}
-                  />
-                ),
-            )}
-            {chartType === 'value' && (
-              <Line
-                type="monotone"
-                dataKey={() => startingCapital}
-                stroke="var(--text-tertiary)"
-                strokeWidth={1}
-                strokeDasharray="5 5"
-                dot={false}
-                activeDot={false}
-                name="Starting Capital"
+      <div style={{ position: 'relative' }}>
+        <motion.div
+          className={`perf-chart-container ${!hasAgentData ? 'perf-chart-pending' : ''}`}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <ResponsiveContainer width="100%" height={420}>
+            <LineChart data={chartData} margin={{ top: 10, right: 30, left: 20, bottom: 10 }}>
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="var(--border-primary)"
+                horizontal
+                vertical={false}
               />
-            )}
-            {(chartType === 'pnl' || chartType === 'pct') && (
-              <Line
-                type="monotone"
-                dataKey={() => 0}
+              <XAxis
+                dataKey="hour"
                 stroke="var(--text-tertiary)"
-                strokeWidth={1}
-                strokeDasharray="5 5"
-                dot={false}
-                activeDot={false}
-                name="Break Even"
+                tick={{
+                  fontSize: 10,
+                  fontFamily: 'JetBrains Mono',
+                  fill: 'var(--text-tertiary)',
+                }}
+                tickLine={false}
+                axisLine={{ stroke: 'var(--border-primary)' }}
+                tickFormatter={(v) => `${v}h`}
               />
-            )}
-          </LineChart>
-        </ResponsiveContainer>
-      </motion.div>
+              <YAxis
+                stroke="var(--text-tertiary)"
+                tick={{
+                  fontSize: 10,
+                  fontFamily: 'JetBrains Mono',
+                  fill: 'var(--text-tertiary)',
+                }}
+                tickLine={false}
+                axisLine={false}
+                tickFormatter={formatYAxis}
+                width={70}
+              />
+              <Tooltip
+                contentStyle={{
+                  background: '#16171d',
+                  border: '1px solid #282a35',
+                  borderRadius: '8px',
+                  fontSize: '11px',
+                  fontFamily: 'JetBrains Mono',
+                  color: '#e8e6e3',
+                  padding: '12px',
+                }}
+                formatter={formatTooltip}
+                labelFormatter={(label) => `Hour ${label}`}
+                labelStyle={{ color: 'var(--text-tertiary)', marginBottom: 6 }}
+              />
+              {AGENTS.map(
+                (agent) =>
+                  activeAgents.includes(agent.id) && (
+                    <Line
+                      key={agent.id}
+                      type="monotone"
+                      dataKey={agent.id}
+                      stroke={agent.color}
+                      strokeWidth={2}
+                      dot={false}
+                      activeDot={{ r: 4, fill: agent.color, stroke: '#0a0a0c', strokeWidth: 2 }}
+                    />
+                  ),
+              )}
+              {chartType === 'value' && (
+                <Line
+                  type="monotone"
+                  dataKey={() => startingCapital}
+                  stroke="var(--text-tertiary)"
+                  strokeWidth={1}
+                  strokeDasharray="5 5"
+                  dot={false}
+                  activeDot={false}
+                  name="Starting Capital"
+                />
+              )}
+              {(chartType === 'pnl' || chartType === 'pct') && (
+                <Line
+                  type="monotone"
+                  dataKey={() => 0}
+                  stroke="var(--text-tertiary)"
+                  strokeWidth={1}
+                  strokeDasharray="5 5"
+                  dot={false}
+                  activeDot={false}
+                  name="Break Even"
+                />
+              )}
+            </LineChart>
+          </ResponsiveContainer>
+        </motion.div>
+        {!hasAgentData && (
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontFamily: 'var(--font-mono)',
+            fontSize: '12px',
+            color: 'var(--text-tertiary)',
+            letterSpacing: '1px',
+            pointerEvents: 'none',
+          }}>
+            CHART WILL POPULATE WHEN TRADING BEGINS
+          </div>
+        )}
+      </div>
     </section>
   );
 }

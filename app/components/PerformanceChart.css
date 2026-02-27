@@ -70,6 +70,10 @@
   padding: 20px 12px;
 }
 
+.perf-chart-pending {
+  opacity: 0.3;
+}
+
 .recharts-tooltip-cursor { stroke: var(--border-secondary) !important; }
 
 @media (max-width: 768px) {

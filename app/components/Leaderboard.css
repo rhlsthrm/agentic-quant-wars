@@ -115,6 +115,11 @@
 .lb-legend-item { display: flex; align-items: center; gap: 6px; }
 .legend-dot { width: 5px; height: 5px; border-radius: 50%; }
 
+.leaderboard-pending {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
 @media (max-width: 1024px) {
   .lb-header, .lb-row { grid-template-columns: 50px 160px 1fr 1fr 90px; }
   .lb-sharpe, .lb-drawdown, .lb-trades, .lb-chart { display: none !important; }
