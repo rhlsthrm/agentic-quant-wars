@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import type { AgentsResponse, CompetitionState } from '@/app/types';
+import { useState, useEffect, useCallback } from 'react';
+import type { AgentsResponse, AgentsHistoryResponse, CompetitionState } from '@/app/types';
 import Navbar from '@/app/components/Navbar';
 import TickerBar from '@/app/components/TickerBar';
 import Hero from '@/app/components/Hero';
@@ -20,22 +20,95 @@ const POLL_INTERVAL_MS = 30_000;
 export default function Page() {
   const [data, setData] = useState<AgentsResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [historyLoading, setHistoryLoading] = useState(true);
+
+  const fetchSummary = useCallback(async () => {
+    try {
+      const res = await fetch('/api/agents/summary');
+      if (!res.ok) throw new Error(`${res.status}`);
+      const json: AgentsResponse = await res.json();
+      return json;
+    } catch {
+      return null;
+    }
+  }, []);
+
+  const fetchHistory = useCallback(async () => {
+    try {
+      const res = await fetch('/api/agents/history');
+      if (!res.ok) throw new Error(`${res.status}`);
+      const json: AgentsHistoryResponse = await res.json();
+      return json;
+    } catch {
+      return null;
+    }
+  }, []);
+
+  const mergeHistory = useCallback(
+    (summary: AgentsResponse, history: AgentsHistoryResponse): AgentsResponse => {
+      const merged = { ...summary, agentData: { ...summary.agentData } };
+      for (const [id, histData] of Object.entries(history.agentHistory)) {
+        if (merged.agentData[id]) {
+          merged.agentData[id] = {
+            ...merged.agentData[id],
+            trades: histData.trades,
+            reasoningLogs: histData.reasoningLogs,
+          };
+        }
+      }
+      // Re-build rankings array to reflect merged data
+      merged.rankings = Object.values(merged.agentData).sort(
+        (a, b) => b.portfolio.totalValue - a.portfolio.totalValue,
+      );
+      return merged;
+    },
+    [],
+  );
 
   useEffect(() => {
     let cancelled = false;
 
     async function poll() {
-      try {
-        const res = await fetch('/api/agents');
-        if (!res.ok) throw new Error(`${res.status}`);
-        const json: AgentsResponse = await res.json();
-        if (cancelled) return;
-        setData(json);
-      } catch {
-        // keep previous data if we had it
-      } finally {
-        if (!cancelled) setLoading(false);
+      // Phase 1: summary (fast)
+      const summary = await fetchSummary();
+      if (cancelled) return;
+
+      if (summary) {
+        setData((prev) => {
+          // If we already have history data, preserve it
+          if (prev && prev.agentData) {
+            const hasHistory = Object.values(prev.agentData).some(
+              (a) => a.trades.length > 0 || a.reasoningLogs.length > 0,
+            );
+            if (hasHistory) {
+              return mergeHistory(summary, {
+                agentHistory: Object.fromEntries(
+                  Object.entries(prev.agentData).map(([id, a]) => [
+                    id,
+                    { trades: a.trades, reasoningLogs: a.reasoningLogs },
+                  ]),
+                ),
+              });
+            }
+          }
+          return summary;
+        });
+        setLoading(false);
+      } else if (!data) {
+        setLoading(false);
       }
+
+      // Phase 2: history (lazy)
+      const history = await fetchHistory();
+      if (cancelled) return;
+
+      if (history && summary) {
+        setData((prev) => {
+          if (!prev) return prev;
+          return mergeHistory(prev, history);
+        });
+      }
+      setHistoryLoading(false);
     }
 
     poll();
@@ -44,7 +117,7 @@ export default function Page() {
       cancelled = true;
       clearInterval(interval);
     };
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (loading) {
     return (
@@ -108,11 +181,11 @@ export default function Page() {
         <AgentCards rankings={rankings} />
         <div className="divider" />
         <div id="feed">
-          <TradeFeed agentData={agentData} />
+          <TradeFeed agentData={agentData} loading={historyLoading} />
         </div>
         <div className="divider" />
         <div id="reasoning">
-          <ReasoningLogs agentData={agentData} />
+          <ReasoningLogs agentData={agentData} loading={historyLoading} />
         </div>
         <div className="divider" />
         <PredictSection />
