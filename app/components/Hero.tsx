@@ -55,17 +55,23 @@ interface HeroProps {
 }
 
 export default function Hero({ competition }: HeroProps) {
-  const endDate = useMemo(
-    () => (competition ? new Date(competition.end) : null),
-    [competition],
-  );
-  const timeLeft = useCountdown(endDate);
-
   const now = new Date();
   const isLive =
     competition != null &&
     now >= new Date(competition.start) &&
     now <= new Date(competition.end);
+  const isUpcoming =
+    competition != null && now < new Date(competition.start);
+  const isEnded =
+    competition != null && now > new Date(competition.end);
+
+  const countdownTarget = useMemo(() => {
+    if (!competition) return null;
+    if (isUpcoming) return new Date(competition.start);
+    if (isLive) return new Date(competition.end);
+    return null; // ended — no countdown
+  }, [competition, isUpcoming, isLive]);
+  const timeLeft = useCountdown(countdownTarget);
 
   return (
     <section className="hero">
@@ -83,7 +89,9 @@ export default function Hero({ competition }: HeroProps) {
           <span className="status-text">
             {isLive
               ? `Competition Live — ${competition!.durationHours} Hours`
-              : 'Competition Upcoming'}
+              : isEnded
+                ? 'Competition Ended'
+                : 'Competition Upcoming'}
           </span>
           <svg
             width="12"
@@ -156,7 +164,7 @@ export default function Hero({ competition }: HeroProps) {
           </div>
         </motion.div>
 
-        {competition && (
+        {competition && !isEnded && (
           <motion.div
             className="hero-countdown"
             initial={{ opacity: 0, y: 20 }}
