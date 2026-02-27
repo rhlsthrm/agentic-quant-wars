@@ -10,7 +10,6 @@ import type { AgentData } from '@/app/types';
 
 interface AgentCardsProps {
   rankings: AgentData[];
-  agentData: Record<string, AgentData>;
 }
 
 export default function AgentCards({ rankings }: AgentCardsProps) {

@@ -105,7 +105,7 @@ export default function Page() {
           <PerformanceChart agentData={agentData} durationHours={competition?.durationHours ?? 168} startingCapital={competition?.startingCapital ?? 100} />
         </div>
         <div className="divider" />
-        <AgentCards rankings={rankings} agentData={agentData} />
+        <AgentCards rankings={rankings} />
         <div className="divider" />
         <div id="feed">
           <TradeFeed agentData={agentData} />

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+
 import { motion } from 'framer-motion';
 import { AGENTS } from '@/app/data/agents';
 import { LifiLogo, PhantomLogo } from './Logos';
@@ -55,22 +56,33 @@ interface HeroProps {
 }
 
 export default function Hero({ competition }: HeroProps) {
-  const now = new Date();
-  const isLive =
-    competition != null &&
-    now >= new Date(competition.start) &&
-    now <= new Date(competition.end);
-  const isUpcoming =
-    competition != null && now < new Date(competition.start);
-  const isEnded =
-    competition != null && now > new Date(competition.end);
+  const [phase, setPhase] = useState<'upcoming' | 'live' | 'ended' | null>(null);
+
+  useEffect(() => {
+    if (!competition) { setPhase(null); return; }
+    const check = () => {
+      const now = Date.now();
+      const start = new Date(competition.start).getTime();
+      const end = new Date(competition.end).getTime();
+      if (now < start) setPhase('upcoming');
+      else if (now <= end) setPhase('live');
+      else setPhase('ended');
+    };
+    check();
+    const interval = setInterval(check, 1000);
+    return () => clearInterval(interval);
+  }, [competition?.start, competition?.end]);
+
+  const isLive = phase === 'live';
+  const isUpcoming = phase === 'upcoming';
+  const isEnded = phase === 'ended';
 
   const countdownTarget = useMemo(() => {
     if (!competition) return null;
     if (isUpcoming) return new Date(competition.start);
     if (isLive) return new Date(competition.end);
-    return null; // ended — no countdown
-  }, [competition, isUpcoming, isLive]);
+    return null;
+  }, [competition?.start, competition?.end, isUpcoming, isLive]);
   const timeLeft = useCountdown(countdownTarget);
 
   return (

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   LineChart,
@@ -25,6 +25,14 @@ export default function PerformanceChart({ agentData, durationHours, startingCap
     AGENTS.filter((a) => agentData?.[a.id]).map((a) => a.id),
   );
   const [chartType, setChartType] = useState<'value' | 'pnl' | 'pct'>('pnl');
+
+  // Sync active agents when agentData transitions from empty to populated
+  useEffect(() => {
+    const ids = AGENTS.filter((a) => agentData?.[a.id]).map((a) => a.id);
+    if (ids.length > 0 && activeAgents.length === 0) {
+      setActiveAgents(ids);
+    }
+  }, [agentData]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const hasAgentData = agentData && Object.keys(agentData).length > 0;
 
