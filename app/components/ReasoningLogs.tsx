@@ -10,10 +10,11 @@ interface ReasoningLogsProps {
 }
 
 export default function ReasoningLogs({ agentData }: ReasoningLogsProps) {
-  const firstAvailable = agentData ? Object.keys(agentData)[0] : AGENTS[0]?.id;
-  const [activeAgent, setActiveAgent] = useState(firstAvailable || 'gpt');
+  const firstAvailable = AGENTS[0]?.id ?? 'gpt';
+  const [activeAgent, setActiveAgent] = useState(firstAvailable);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  const agentConfig = AGENTS.find((a) => a.id === activeAgent);
   const agent = agentData?.[activeAgent];
   // Show newest first
   const logs = [...(agent?.reasoningLogs || [])].reverse();
@@ -24,8 +25,6 @@ export default function ReasoningLogs({ agentData }: ReasoningLogsProps) {
       scrollRef.current.scrollTop = 0;
     }
   }, [activeAgent]);
-
-  if (!agentData) return null;
 
   return (
     <section className="reasoning-section section section-gap">
@@ -38,7 +37,7 @@ export default function ReasoningLogs({ agentData }: ReasoningLogsProps) {
       </div>
 
       <div className="reasoning-agents">
-        {AGENTS.filter((a) => agentData?.[a.id]).map((a) => (
+        {AGENTS.map((a) => (
           <button
             key={a.id}
             className={`ra-tab ${activeAgent === a.id ? 'active' : ''}`}
@@ -60,29 +59,35 @@ export default function ReasoningLogs({ agentData }: ReasoningLogsProps) {
           </div>
           <div className="term-title">
             <Terminal size={12} />
-            {agent?.name} — Reasoning Engine v1.0
+            {agentConfig?.name ?? 'Agent'} — Reasoning Engine v1.0
           </div>
           <div className="term-status">
-            <span className="term-live-dot" />
-            LIVE
+            {agent && (
+              <>
+                <span className="term-live-dot" />
+                LIVE
+              </>
+            )}
           </div>
         </div>
 
         <div className="term-info">
           <span className="ti-item">
             <span className="ti-label">STRATEGY:</span>
-            {agent?.strategy}
+            {agentConfig?.strategy}
           </span>
           <span className="ti-item">
             <span className="ti-label">PERSONALITY:</span>
-            {agent?.personality}
+            {agentConfig?.personality}
           </span>
         </div>
 
         <div className="term-output" ref={scrollRef}>
           {logs.length === 0 && (
             <div style={{ padding: '24px', color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)', fontSize: '12px' }}>
-              No reasoning logs yet — waiting for agent cycles...
+              {agent
+                ? 'No reasoning logs yet — waiting for agent cycles...'
+                : 'Waiting for competition to begin — agent reasoning will appear here'}
             </div>
           )}
           {logs.map((log, i) => (
