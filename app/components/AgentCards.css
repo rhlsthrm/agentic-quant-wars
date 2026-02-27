@@ -91,4 +91,14 @@
   font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary);
 }
 
+.agents-grid-pending {
+  opacity: 0.6;
+}
+.agents-grid-pending .ac-chart {
+  display: none;
+}
+.agents-grid-pending .ac-expand {
+  display: none;
+}
+
 @media (max-width: 768px) { .agents-grid { grid-template-columns: 1fr; } }

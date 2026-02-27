@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { LineChart, Line, ResponsiveContainer, Tooltip, YAxis } from 'recharts';
 import { Wallet, Brain, ChevronDown, ChevronUp } from 'lucide-react';
 import { AGENT_LOGOS } from './Logos';
+import { AGENTS } from '@/app/data/agents';
 import type { AgentData } from '@/app/types';
 
 interface AgentCardsProps {
@@ -15,7 +16,26 @@ interface AgentCardsProps {
 export default function AgentCards({ rankings }: AgentCardsProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  if (!rankings) return null;
+  const hasRankings = rankings && rankings.length > 0;
+  const displayAgents: AgentData[] = hasRankings
+    ? rankings
+    : AGENTS.map((agent, i) => ({
+        ...agent,
+        rank: i + 1,
+        portfolio: {
+          cash: 0,
+          totalValue: 0,
+          pnl: 0,
+          pnlPct: 0,
+          maxDrawdown: 0,
+          sharpeRatio: 0,
+          totalTrades: 0,
+          holdings: [],
+        },
+        trades: [],
+        reasoningLogs: [],
+        portfolioHistory: [],
+      }));
 
   return (
     <section id="agents" className="agents-section section section-gap">
@@ -23,13 +43,14 @@ export default function AgentCards({ rankings }: AgentCardsProps) {
         <div className="section-label">Agent Profiles</div>
         <h2 className="section-title">Meet the Agents</h2>
         <p className="section-subtitle">
-          Each agent starts with $2,000 in USDC, provisioned via Phantom MCP, trading crypto
-          assets via LI.FI
+          {hasRankings
+            ? 'Each agent starts with $2,000 in USDC, provisioned via Phantom MCP, trading crypto assets via LI.FI'
+            : 'Meet the five AI competitors preparing to trade'}
         </p>
       </div>
 
-      <div className="agents-grid">
-        {rankings.map((agent, i) => {
+      <div className={`agents-grid ${!hasRankings ? 'agents-grid-pending' : ''}`}>
+        {displayAgents.map((agent, i) => {
           const isExpanded = expandedId === agent.id;
           const isProfit = agent.portfolio.pnl >= 0;
           const data = agent.portfolioHistory.filter((_, idx) => idx % 4 === 0);
@@ -98,26 +119,26 @@ export default function AgentCards({ rankings }: AgentCardsProps) {
                 <div className="ac-metric">
                   <span className="ac-metric-label">Portfolio</span>
                   <span className="ac-metric-value">
-                    $
-                    {agent.portfolio.totalValue.toLocaleString(undefined, {
-                      minimumFractionDigits: 2,
-                    })}
+                    {hasRankings
+                      ? `$${agent.portfolio.totalValue.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
+                      : '—'}
                   </span>
                 </div>
                 <div className="ac-metric">
                   <span className="ac-metric-label">PnL</span>
-                  <span className={`ac-metric-value ${isProfit ? 'profit' : 'loss'}`}>
-                    {isProfit ? '+' : ''}
-                    {agent.portfolio.pnlPct}%
+                  <span className={`ac-metric-value ${hasRankings ? (isProfit ? 'profit' : 'loss') : ''}`}>
+                    {hasRankings
+                      ? `${isProfit ? '+' : ''}${agent.portfolio.pnlPct}%`
+                      : '—'}
                   </span>
                 </div>
                 <div className="ac-metric">
                   <span className="ac-metric-label">Trades</span>
-                  <span className="ac-metric-value">{agent.portfolio.totalTrades}</span>
+                  <span className="ac-metric-value">{hasRankings ? agent.portfolio.totalTrades : '—'}</span>
                 </div>
                 <div className="ac-metric">
                   <span className="ac-metric-label">Sharpe</span>
-                  <span className="ac-metric-value">{agent.portfolio.sharpeRatio}</span>
+                  <span className="ac-metric-value">{hasRankings ? agent.portfolio.sharpeRatio : '—'}</span>
                 </div>
               </div>
 
