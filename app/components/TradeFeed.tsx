@@ -12,9 +12,10 @@ interface FeedTrade extends Trade {
 
 interface TradeFeedProps {
   agentData: Record<string, AgentData>;
+  loading?: boolean;
 }
 
-export default function TradeFeed({ agentData }: TradeFeedProps) {
+export default function TradeFeed({ agentData, loading }: TradeFeedProps) {
   const allTrades: FeedTrade[] = [];
   Object.values(agentData ?? {}).forEach((agent) => {
     agent.trades.forEach((trade) => {
@@ -47,7 +48,12 @@ export default function TradeFeed({ agentData }: TradeFeedProps) {
         </div>
 
         <div className="feed-list">
-          {allTrades.length === 0 && (
+          {loading && allTrades.length === 0 && (
+            <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)', fontSize: '12px' }}>
+              Loading trade history...
+            </div>
+          )}
+          {!loading && allTrades.length === 0 && (
             <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)', fontSize: '12px' }}>
               No trades yet — waiting for agents to execute...
             </div>

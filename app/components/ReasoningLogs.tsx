@@ -7,9 +7,10 @@ import type { AgentData } from '@/app/types';
 
 interface ReasoningLogsProps {
   agentData: Record<string, AgentData>;
+  loading?: boolean;
 }
 
-export default function ReasoningLogs({ agentData }: ReasoningLogsProps) {
+export default function ReasoningLogs({ agentData, loading }: ReasoningLogsProps) {
   const firstAvailable = AGENTS[0]?.id ?? 'gpt';
   const [activeAgent, setActiveAgent] = useState(firstAvailable);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -83,7 +84,12 @@ export default function ReasoningLogs({ agentData }: ReasoningLogsProps) {
         </div>
 
         <div className="term-output" ref={scrollRef}>
-          {logs.length === 0 && (
+          {loading && logs.length === 0 && (
+            <div style={{ padding: '24px', color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)', fontSize: '12px' }}>
+              Loading reasoning logs...
+            </div>
+          )}
+          {!loading && logs.length === 0 && (
             <div style={{ padding: '24px', color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)', fontSize: '12px' }}>
               {agent
                 ? 'No reasoning logs yet — waiting for agent cycles...'
