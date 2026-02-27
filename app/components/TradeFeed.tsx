@@ -98,7 +98,7 @@ export default function TradeFeed({ agentData, loading }: TradeFeedProps) {
               <div key={agent.id} className="feed-stat">
                 <span className="fs-dot" style={{ background: agent.color }} />
                 <span className="fs-name">{agent.name}</span>
-                <span className="fs-count">{data?.portfolio.totalTrades ?? 0} trades</span>
+                <span className="fs-count">{(() => { const count = data?.portfolio.totalTrades ?? 0; return `${count} ${count === 1 ? 'trade' : 'trades'}`; })()}</span>
               </div>
             );
           })}

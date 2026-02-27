@@ -131,7 +131,11 @@ export default function Leaderboard({ rankings }: LeaderboardProps) {
               </div>
 
               <div className="lb-col lb-drawdown">
-                {hasRankings ? `-${agent.portfolio.maxDrawdown}%` : '—'}
+                {hasRankings
+                  ? agent.portfolio.maxDrawdown > 0
+                    ? `-${agent.portfolio.maxDrawdown}%`
+                    : '0%'
+                  : '—'}
               </div>
 
               <div className="lb-col lb-trades">

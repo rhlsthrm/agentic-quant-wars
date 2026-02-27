@@ -100,6 +100,13 @@ export function transformDashboard(
   };
 }
 
+const JUNK_REASONING = [
+  '[SYNTHETIC]',
+  'No agent reasoning text was provided',
+  'No agent cycle transcript/log was provided',
+];
+const isJunkReasoning = (t: string) => JUNK_REASONING.some((p) => t.includes(p));
+
 export function transformHistory(
   dashboard: AgentDashboardResponse,
   history: AgentHistoryCycle[],
@@ -122,6 +129,9 @@ export function transformHistory(
       hadValidTrade = true;
 
       const symbol = trade.type === 'SELL' ? trade.fromSymbol : trade.toSymbol;
+      const rawReasoning = trade.rationale || trade.summary;
+      const reasoning = rawReasoning && isJunkReasoning(rawReasoning) ? 'Analysis unavailable' : rawReasoning;
+
       trades.push({
         type: trade.type as 'BUY' | 'SELL',
         stock: symbol,
@@ -134,14 +144,16 @@ export function transformHistory(
         value: Math.round(trade.amount_usd * 100) / 100,
         hour,
         timestamp: hour,
-        reasoning: trade.rationale || trade.summary,
+        reasoning,
       });
 
-      reasoningLogs.push({
-        hour,
-        text: trade.rationale || trade.summary,
-        trade: `${trade.type} ${symbol} for $${Math.round(trade.amount_usd)}`,
-      });
+      if (!isJunkReasoning(rawReasoning || '')) {
+        reasoningLogs.push({
+          hour,
+          text: rawReasoning,
+          trade: `${trade.type} ${symbol} for $${Math.round(trade.amount_usd)}`,
+        });
+      }
     }
 
     if (!hadValidTrade && cycle.reasoning) {
@@ -158,11 +170,13 @@ export function transformHistory(
       } else {
         text = JSON.stringify(cycle.reasoning).slice(0, 200);
       }
-      reasoningLogs.push({
-        hour,
-        text,
-        trade: 'No trade this cycle',
-      });
+      if (!isJunkReasoning(text)) {
+        reasoningLogs.push({
+          hour,
+          text,
+          trade: 'No trade this cycle',
+        });
+      }
     }
   }
 

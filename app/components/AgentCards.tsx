@@ -10,9 +10,10 @@ import type { AgentData } from '@/app/types';
 
 interface AgentCardsProps {
   rankings: AgentData[];
+  startingCapital: number;
 }
 
-export default function AgentCards({ rankings }: AgentCardsProps) {
+export default function AgentCards({ rankings, startingCapital }: AgentCardsProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const hasRankings = rankings && rankings.length > 0;
@@ -44,7 +45,7 @@ export default function AgentCards({ rankings }: AgentCardsProps) {
         <h2 className="section-title">Meet the Agents</h2>
         <p className="section-subtitle">
           {hasRankings
-            ? 'Each agent starts with $2,000 in USDC, provisioned via Phantom MCP, trading crypto assets via LI.FI'
+            ? `Each agent starts with $${startingCapital.toLocaleString()} in USDC, provisioned via Phantom MCP, trading crypto assets via LI.FI`
             : 'Meet the five AI competitors preparing to trade'}
         </p>
       </div>
