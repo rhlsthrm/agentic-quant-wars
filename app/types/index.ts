@@ -48,6 +48,7 @@ export interface Trade {
 
 export interface ReasoningLog {
   hour: number;
+  timestamp: number;
   text: string;
   trade: string;
 }

@@ -2,6 +2,7 @@
 
 import { ArrowUpRight, ArrowDownRight, Zap } from 'lucide-react';
 import { AGENTS } from '@/app/data/agents';
+import { timeAgo } from '@/app/utils/timeAgo';
 import type { AgentData, Trade } from '@/app/types';
 
 interface FeedTrade extends Trade {
@@ -28,7 +29,7 @@ export default function TradeFeed({ agentData, loading }: TradeFeedProps) {
     });
   });
   // Newest first
-  allTrades.sort((a, b) => b.hour - a.hour);
+  allTrades.sort((a, b) => b.timestamp - a.timestamp);
 
   return (
     <section className="feed-section section section-gap">
@@ -64,7 +65,7 @@ export default function TradeFeed({ agentData, loading }: TradeFeedProps) {
               className={`feed-item ${trade.type === 'BUY' ? 'buy' : 'sell'}`}
             >
               <div className="fi-time">
-                <span className="fi-hour">H{trade.hour}</span>
+                <span className="fi-hour">{timeAgo(trade.timestamp)}</span>
               </div>
               <div
                 className="fi-agent-dot"

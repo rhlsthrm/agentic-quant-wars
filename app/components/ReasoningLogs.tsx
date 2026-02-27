@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Terminal, ChevronRight } from 'lucide-react';
 import { AGENTS } from '@/app/data/agents';
+import { timeAgo } from '@/app/utils/timeAgo';
 import type { AgentData } from '@/app/types';
 
 interface ReasoningLogsProps {
@@ -100,8 +101,7 @@ export default function ReasoningLogs({ agentData, loading }: ReasoningLogsProps
             <div key={`${activeAgent}-${log.hour}-${i}`} className="log-entry">
               <div className="log-meta">
                 <span className="log-timestamp">
-                  [{String(Math.floor(log.hour / 24)).padStart(2, '0')}d{' '}
-                  {String(log.hour % 24).padStart(2, '0')}h]
+                  [{timeAgo(log.timestamp)}]
                 </span>
                 <span className="log-trade">{log.trade}</span>
               </div>

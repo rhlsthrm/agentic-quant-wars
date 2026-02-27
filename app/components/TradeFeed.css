@@ -41,7 +41,7 @@
 .feed-item.buy { border-left: 2px solid var(--green); }
 .feed-item.sell { border-left: 2px solid var(--loss-red); }
 
-.fi-time { min-width: 36px; }
+.fi-time { min-width: 52px; }
 .fi-hour { color: var(--text-tertiary); font-size: 9px; font-weight: 500; }
 .fi-agent-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
 

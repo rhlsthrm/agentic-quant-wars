@@ -122,6 +122,7 @@ export function transformHistory(
 
   for (const cycle of chronological) {
     const hour = toHourOffset(cycle.timestamp, competitionStart, durationHours);
+    const realTimestamp = new Date(cycle.timestamp).getTime();
     let hadValidTrade = false;
 
     for (const trade of cycle.trades || []) {
@@ -143,13 +144,14 @@ export function transformHistory(
         price: trade.executed_price ?? 0,
         value: Math.round(trade.amount_usd * 100) / 100,
         hour,
-        timestamp: hour,
+        timestamp: realTimestamp,
         reasoning,
       });
 
       if (!isJunkReasoning(rawReasoning || '')) {
         reasoningLogs.push({
           hour,
+          timestamp: realTimestamp,
           text: rawReasoning,
           trade: `${trade.type} ${symbol} for $${Math.round(trade.amount_usd)}`,
         });
@@ -173,6 +175,7 @@ export function transformHistory(
       if (!isJunkReasoning(text)) {
         reasoningLogs.push({
           hour,
+          timestamp: realTimestamp,
           text,
           trade: 'No trade this cycle',
         });
