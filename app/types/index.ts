@@ -154,4 +154,13 @@ export interface AgentHistoryCycle {
   reasoning: unknown;
 }
 
+export interface AgentHistoryData {
+  trades: Trade[];
+  reasoningLogs: ReasoningLog[];
+}
+
+export interface AgentsHistoryResponse {
+  agentHistory: Record<string, AgentHistoryData>;
+}
+
 export type CompetitionState = 'upcoming' | 'live' | 'ended';
