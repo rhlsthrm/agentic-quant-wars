@@ -17,6 +17,7 @@ export default function Leaderboard({ rankings }: LeaderboardProps) {
     : AGENTS.map((agent, i) => ({
         ...agent,
         rank: i + 1,
+        walletAddress: null,
         portfolio: {
           cash: 0,
           totalValue: 0,

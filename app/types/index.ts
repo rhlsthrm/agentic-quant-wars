@@ -60,6 +60,7 @@ export interface PortfolioSnapshot {
 
 export interface AgentData extends AgentConfig {
   rank: number;
+  walletAddress: string | null;
   portfolio: Portfolio;
   trades: Trade[];
   reasoningLogs: ReasoningLog[];

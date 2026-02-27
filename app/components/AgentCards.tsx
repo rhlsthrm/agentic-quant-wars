@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LineChart, Line, ResponsiveContainer, Tooltip, YAxis } from 'recharts';
-import { Wallet, Brain, ChevronDown, ChevronUp } from 'lucide-react';
+import { Wallet, Brain, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
 import { AGENT_LOGOS } from './Logos';
 import { AGENTS } from '@/app/data/agents';
 import type { AgentData } from '@/app/types';
@@ -21,6 +21,7 @@ export default function AgentCards({ rankings }: AgentCardsProps) {
     : AGENTS.map((agent, i) => ({
         ...agent,
         rank: i + 1,
+        walletAddress: null,
         portfolio: {
           cash: 0,
           totalValue: 0,
@@ -76,6 +77,18 @@ export default function AgentCards({ rankings }: AgentCardsProps) {
                   <h3 className="ac-name">{agent.name}</h3>
                   <span className="ac-model">{agent.model}</span>
                 </div>
+                {agent.walletAddress && (
+                  <a
+                    href={`https://debank.com/profile/${agent.walletAddress}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ac-debank"
+                    title="View on DeBank"
+                  >
+                    <ExternalLink size={12} />
+                    DeBank
+                  </a>
+                )}
               </div>
 
               <div className="ac-strategy">

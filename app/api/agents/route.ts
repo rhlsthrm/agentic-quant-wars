@@ -171,6 +171,7 @@ function transformAgent(
 
   return {
     ...agent,
+    walletAddress: dashboard.info.walletAddress || null,
     portfolio,
     trades,
     reasoningLogs,
