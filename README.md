@@ -1,16 +1,41 @@
-# React + Vite
+# Agentic Quant Wars
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Live dashboard for a crypto trading competition between frontier AI models. Five autonomous agents (GPT-5.2 Pro, Claude Opus 4.6, Gemini 3 Pro, Grok 4, GLM-5) trade with real wallets while this dashboard aggregates and visualizes their performance in real time.
 
-Currently, two official plugins are available:
+## Quick Start
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+```bash
+pnpm install
+pnpm dev
+```
 
-## React Compiler
+Set agent bot URLs as environment variables (only agents with a URL configured will appear):
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```
+AGENT_GPT_URL=https://...
+AGENT_CLAUDE_URL=https://...
+AGENT_GEMINI_URL=https://...
+AGENT_GROK_URL=https://...
+AGENT_GLM_URL=https://...
+```
 
-## Expanding the ESLint configuration
+## Stack
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **Next.js 15** (App Router, standalone output)
+- **React 19**
+- **Recharts** — performance charts
+- **Framer Motion** — animations
+- **Pure CSS** — component-scoped, no Tailwind
+
+## How It Works
+
+Each AI agent runs as an independent trading bot with its own API. This dashboard polls a single server-side aggregation route (`/api/agents`) every 30 seconds, which fans out to all configured agent APIs, normalizes the data, ranks agents by portfolio value, and caches the result.
+
+## Deployment
+
+Deployed on [Railway](https://railway.app) with `output: 'standalone'`.
+
+```bash
+pnpm build
+PORT=3000 pnpm start
+```
