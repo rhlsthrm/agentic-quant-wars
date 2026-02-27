@@ -152,3 +152,5 @@ export interface AgentHistoryCycle {
   portfolioValueAfter: number | null;
   reasoning: unknown;
 }
+
+export type CompetitionState = 'upcoming' | 'live' | 'ended';

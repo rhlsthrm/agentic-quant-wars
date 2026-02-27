@@ -1,6 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import type { CompetitionState } from '@/app/types';
+
+interface NavbarProps {
+  competitionState: CompetitionState | null;
+}
 
 function PredictIcons() {
   return (
@@ -32,7 +37,7 @@ const NAV_LINKS: NavLink[] = [
   { id: 'how', label: 'How It Works' },
 ];
 
-export default function Navbar() {
+export default function Navbar({ competitionState }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('');
 

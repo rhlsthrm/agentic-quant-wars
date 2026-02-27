@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import type { AgentsResponse } from '@/app/types';
+import type { AgentsResponse, CompetitionState } from '@/app/types';
 import Navbar from '@/app/components/Navbar';
 import TickerBar from '@/app/components/TickerBar';
 import Hero from '@/app/components/Hero';
@@ -58,7 +58,7 @@ export default function Page() {
         </div>
         <div className="app-header-blur" />
         <div className="app-noise" />
-        <Navbar />
+        <Navbar competitionState={null} />
         <LoadingSkeleton />
       </div>
     );
@@ -69,6 +69,16 @@ export default function Page() {
   const rankings = hasData ? data.rankings : [];
   const tokenPrices = data?.tokenPrices ?? {};
   const competition = data?.competition ?? null;
+
+  const competitionState: CompetitionState | null = (() => {
+    if (!competition) return null;
+    const now = Date.now();
+    const start = new Date(competition.start).getTime();
+    const end = new Date(competition.end).getTime();
+    if (now < start) return 'upcoming';
+    if (now <= end) return 'live';
+    return 'ended';
+  })();
 
   return (
     <div className="app">
@@ -83,7 +93,7 @@ export default function Page() {
       <div className="app-header-blur" />
       <div className="app-noise" />
 
-      <Navbar />
+      <Navbar competitionState={competitionState} />
       <TickerBar tokenPrices={tokenPrices} />
 
       <main className="app-main">
