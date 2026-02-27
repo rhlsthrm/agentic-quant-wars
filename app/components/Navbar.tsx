@@ -77,10 +77,18 @@ export default function Navbar({ competitionState }: NavbarProps) {
         </div>
 
         <div className="nav-actions">
-          <span className="nav-live-badge">
-            <span className="nav-live-dot" />
-            LIVE
-          </span>
+          {competitionState === 'live' && (
+            <span className="nav-live-badge">
+              <span className="nav-live-dot" />
+              LIVE
+            </span>
+          )}
+          {competitionState === 'upcoming' && (
+            <span className="nav-live-badge nav-upcoming-badge">
+              <span className="nav-live-dot nav-upcoming-dot" />
+              UPCOMING
+            </span>
+          )}
         </div>
       </nav>
     </header>

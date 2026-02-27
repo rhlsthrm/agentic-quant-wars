@@ -95,6 +95,15 @@
   animation: pulse 2s ease-in-out infinite;
   box-shadow: 0 0 8px var(--green);
 }
+.nav-upcoming-badge {
+  color: var(--yellow, #f0b429);
+  border-color: rgba(240, 180, 41, 0.25);
+  background: rgba(240, 180, 41, 0.06);
+}
+.nav-upcoming-dot {
+  background: var(--yellow, #f0b429);
+  box-shadow: 0 0 8px var(--yellow, #f0b429);
+}
 
 @media (max-width: 900px) {
   .nav-links {
