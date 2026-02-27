@@ -15,10 +15,8 @@ interface TradeFeedProps {
 }
 
 export default function TradeFeed({ agentData }: TradeFeedProps) {
-  if (!agentData) return null;
-
   const allTrades: FeedTrade[] = [];
-  Object.values(agentData).forEach((agent) => {
+  Object.values(agentData ?? {}).forEach((agent) => {
     agent.trades.forEach((trade) => {
       allTrades.push({
         ...trade,
