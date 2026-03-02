@@ -66,11 +66,11 @@ export function GeminiLogo({ size = 32, className = '' }: LogoProps) {
   );
 }
 
-export function GrokLogo({ size = 32, className = '' }: LogoProps) {
+export function MinimaxLogo({ size = 32, className = '' }: LogoProps) {
   return (
     <img
-      src="/logos/grok.webp"
-      alt="Grok"
+      src="/logos/minimax.png"
+      alt="MiniMax"
       width={size}
       height={size}
       className={className}
@@ -96,6 +96,6 @@ export const AGENT_LOGOS: Record<string, React.ComponentType<LogoProps>> = {
   gpt: OpenAILogo,
   claude: ClaudeLogo,
   gemini: GeminiLogo,
-  grok: GrokLogo,
+  minimax: MinimaxLogo,
   glm: GLMLogo,
 };

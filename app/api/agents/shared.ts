@@ -13,7 +13,7 @@ export const AGENT_URL_MAP: Record<string, string> = {
   gpt: 'AGENT_GPT_URL',
   claude: 'AGENT_CLAUDE_URL',
   gemini: 'AGENT_GEMINI_URL',
-  grok: 'AGENT_GROK_URL',
+  minimax: 'AGENT_MINIMAX_URL',
   glm: 'AGENT_GLM_URL',
 };
 
