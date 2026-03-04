@@ -1,0 +1,298 @@
+/* ========================================
+   Competition Results — cr- prefix
+   ======================================== */
+
+.cr-section {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 120px 24px 60px;
+  overflow: hidden;
+}
+
+/* Reuse hero background overlay */
+.cr-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: url('/hero-bg.png') center center / cover no-repeat;
+  opacity: 0.1;
+  pointer-events: none;
+}
+.cr-section::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    transparent 50%,
+    rgba(0, 0, 0, 0.6) 80%,
+    var(--bg-void) 100%
+  );
+  pointer-events: none;
+}
+
+.cr-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 1000px;
+  width: 100%;
+}
+
+/* Fallback */
+.cr-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 60px 24px;
+  position: relative;
+  z-index: 2;
+}
+.cr-fallback-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: var(--text-tertiary);
+}
+.cr-fallback-text {
+  font-size: 18px;
+  color: var(--text-secondary);
+}
+
+/* Spotlight label */
+.cr-spotlight {
+  margin-bottom: 32px;
+}
+.cr-spotlight-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 18px;
+  border-radius: 100px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: var(--gold);
+}
+
+/* Winner */
+.cr-winner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 48px;
+}
+.cr-winner-logo {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+.cr-winner-glow {
+  position: absolute;
+  inset: -50%;
+  pointer-events: none;
+}
+.cr-winner-name {
+  font-family: var(--font-display);
+  font-size: clamp(36px, 6vw, 56px);
+  font-weight: 700;
+  color: var(--text-bright);
+  letter-spacing: -1px;
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+.cr-winner-model {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 28px;
+}
+.cr-winner-stats {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  margin-bottom: 24px;
+}
+.cr-winner-stat {
+  text-align: center;
+}
+.cr-winner-stat-value {
+  font-family: var(--font-mono);
+  font-size: clamp(24px, 4vw, 32px);
+  font-weight: 700;
+  color: var(--text-bright);
+  line-height: 1.2;
+}
+.cr-winner-stat-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+.cr-winner-stat-divider {
+  width: 1px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.08);
+}
+.cr-winner-strategy {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-style: italic;
+  color: var(--text-secondary);
+  max-width: 400px;
+}
+
+/* Profit / Loss colors */
+.cr-profit { color: var(--green) !important; }
+.cr-loss { color: var(--loss-red) !important; }
+
+/* Podium */
+.cr-podium {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr 1fr;
+  gap: 16px;
+  width: 100%;
+  max-width: 700px;
+  margin-bottom: 48px;
+}
+.cr-podium-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 24px 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.cr-podium-winner {
+  background: rgba(255, 255, 255, 0.03);
+}
+.cr-podium-rank {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  letter-spacing: 1px;
+}
+.cr-podium-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cr-podium-name {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-bright);
+}
+.cr-podium-value {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-bright);
+}
+.cr-podium-return {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+}
+.cr-podium-trades {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.5px;
+}
+
+/* Aggregate stats */
+.cr-stats {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 20px 32px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.cr-stat {
+  text-align: center;
+}
+.cr-stat-value {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-bright);
+  margin-bottom: 2px;
+}
+.cr-stat-label {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+.cr-stat-divider {
+  width: 1px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .cr-podium {
+    grid-template-columns: 1fr;
+    max-width: 320px;
+  }
+  /* Reorder: winner on top in mobile */
+  .cr-podium-card:nth-child(1) { order: 2; }
+  .cr-podium-card:nth-child(2) { order: 1; }
+  .cr-podium-card:nth-child(3) { order: 3; }
+
+  .cr-winner-stats {
+    gap: 20px;
+  }
+
+  .cr-stats {
+    gap: 16px;
+    padding: 16px 20px;
+  }
+  .cr-stat-divider {
+    display: none;
+  }
+}

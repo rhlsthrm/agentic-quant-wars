@@ -5,6 +5,7 @@ import type { AgentsResponse, AgentsHistoryResponse, CompetitionState } from '@/
 import Navbar from '@/app/components/Navbar';
 import TickerBar from '@/app/components/TickerBar';
 import Hero from '@/app/components/Hero';
+import CompetitionResults from '@/app/components/CompetitionResults';
 import Leaderboard from '@/app/components/Leaderboard';
 import AgentCards from '@/app/components/AgentCards';
 import TradeFeed from '@/app/components/TradeFeed';
@@ -170,9 +171,13 @@ export default function Page() {
       <TickerBar tokenPrices={tokenPrices} />
 
       <main className="app-main">
-        <Hero rankings={rankings} competition={competition} />
+        {competitionState === 'ended' ? (
+          <CompetitionResults rankings={rankings} agentData={agentData} competition={competition} />
+        ) : (
+          <Hero rankings={rankings} competition={competition} />
+        )}
         <div className="divider" />
-        <Leaderboard rankings={rankings} />
+        <Leaderboard rankings={rankings} competitionState={competitionState} />
         <div className="divider" />
         <div id="trajectories">
           <PerformanceChart agentData={agentData} durationHours={competition?.durationHours ?? 168} startingCapital={competition?.startingCapital ?? 100} />

@@ -104,6 +104,17 @@
   background: var(--yellow, #f0b429);
   box-shadow: 0 0 8px var(--yellow, #f0b429);
 }
+.nav-ended-badge {
+  color: var(--gold);
+  border-color: rgba(201, 164, 78, 0.25);
+  background: rgba(201, 164, 78, 0.06);
+}
+.nav-ended-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+}
 
 @media (max-width: 900px) {
   .nav-links {

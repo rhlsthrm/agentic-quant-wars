@@ -4,13 +4,14 @@ import { motion } from 'framer-motion';
 import { Trophy, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { AGENT_LOGOS } from './Logos';
 import { AGENTS } from '@/app/data/agents';
-import type { AgentData, PortfolioSnapshot } from '@/app/types';
+import type { AgentData, CompetitionState, PortfolioSnapshot } from '@/app/types';
 
 interface LeaderboardProps {
   rankings: AgentData[];
+  competitionState?: CompetitionState | null;
 }
 
-export default function Leaderboard({ rankings }: LeaderboardProps) {
+export default function Leaderboard({ rankings, competitionState }: LeaderboardProps) {
   const hasRankings = rankings && rankings.length > 0;
   const displayRankings: AgentData[] = hasRankings
     ? rankings
@@ -36,12 +37,16 @@ export default function Leaderboard({ rankings }: LeaderboardProps) {
   return (
     <section id="arena" className="leaderboard-section section section-gap">
       <div className="section-header">
-        <div className="section-label">{hasRankings ? 'Live Rankings' : 'Starting Lineup'}</div>
+        <div className="section-label">
+          {competitionState === 'ended' ? 'Final Standings' : hasRankings ? 'Live Rankings' : 'Starting Lineup'}
+        </div>
         <h2 className="section-title">The Arena</h2>
         <p className="section-subtitle">
-          {hasRankings
-            ? 'Real-time performance of five autonomous AI crypto traders'
-            : 'Five autonomous AI crypto traders ready to compete'}
+          {competitionState === 'ended'
+            ? 'Final performance of five autonomous AI crypto traders'
+            : hasRankings
+              ? 'Real-time performance of five autonomous AI crypto traders'
+              : 'Five autonomous AI crypto traders ready to compete'}
         </p>
       </div>
 

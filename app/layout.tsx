@@ -17,6 +17,7 @@ import './components/PredictSection.css';
 import './components/HowItWorks.css';
 import './components/Footer.css';
 import './components/LoadingSkeleton.css';
+import './components/CompetitionResults.css';
 
 export const metadata: Metadata = {
   title: 'Agentic Quant Wars | AI Crypto Trading Arena',

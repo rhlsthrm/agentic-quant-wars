@@ -89,6 +89,12 @@ export default function Navbar({ competitionState }: NavbarProps) {
               UPCOMING
             </span>
           )}
+          {competitionState === 'ended' && (
+            <span className="nav-live-badge nav-ended-badge">
+              <span className="nav-ended-dot" />
+              ENDED
+            </span>
+          )}
         </div>
       </nav>
     </header>
