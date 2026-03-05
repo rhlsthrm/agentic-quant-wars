@@ -6,11 +6,58 @@ import { LineChart, Line, ResponsiveContainer, Tooltip, YAxis } from 'recharts';
 import { Wallet, Brain, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
 import { AGENT_LOGOS } from './Logos';
 import { AGENTS } from '@/app/data/agents';
-import type { AgentData } from '@/app/types';
+import { getChainInfo } from '@/app/utils/chains';
+import type { AgentData, Holding } from '@/app/types';
 
 interface AgentCardsProps {
   rankings: AgentData[];
   startingCapital: number;
+}
+
+function ChainDistribution({ holdings }: { holdings: Holding[] }) {
+  if (holdings.length === 0) return null;
+
+  const chainTotals = new Map<number, { value: number; info: ReturnType<typeof getChainInfo> }>();
+  let totalValue = 0;
+  for (const h of holdings) {
+    const existing = chainTotals.get(h.chainId);
+    if (existing) {
+      existing.value += h.value;
+    } else {
+      chainTotals.set(h.chainId, { value: h.value, info: getChainInfo(h.chainId) });
+    }
+    totalValue += h.value;
+  }
+  if (totalValue <= 0) return null;
+
+  const chains = [...chainTotals.entries()]
+    .map(([id, { value, info }]) => ({ id, pct: (value / totalValue) * 100, info }))
+    .sort((a, b) => b.pct - a.pct);
+
+  if (chains.length <= 1) return null;
+
+  return (
+    <div className="chain-distribution">
+      <div className="chain-bar">
+        {chains.map((c) => (
+          <div
+            key={c.id}
+            className="chain-bar-segment"
+            style={{ width: `${c.pct}%`, background: c.info.color }}
+            title={`${c.info.name}: ${c.pct.toFixed(1)}%`}
+          />
+        ))}
+      </div>
+      <div className="chain-legend">
+        {chains.map((c) => (
+          <span key={c.id} className="chain-legend-item">
+            <span className="chain-legend-dot" style={{ background: c.info.color }} />
+            {c.info.short} {c.pct.toFixed(0)}%
+          </span>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 export default function AgentCards({ rankings, startingCapital }: AgentCardsProps) {
@@ -174,25 +221,38 @@ export default function AgentCards({ rankings, startingCapital }: AgentCardsProp
                   >
                     <div className="holdings-header">
                       <span>Asset</span>
+                      <span className="holdings-chain-col">Chain</span>
                       <span>Tokens</span>
                       <span>Value</span>
                       <span>PnL</span>
                     </div>
                     {agent.portfolio.holdings.length > 0 ? (
-                      agent.portfolio.holdings.map((h) => (
-                        <div key={h.symbol} className="holding-row">
-                          <span className="holding-symbol">{h.symbol}</span>
-                          <span className="holding-tokens">{h.tokens.toFixed(2)}</span>
-                          <span className="holding-value">${h.value.toLocaleString()}</span>
-                          <span className={`holding-pnl ${h.pnl >= 0 ? 'profit' : 'loss'}`}>
-                            {h.pnl >= 0 ? '+' : ''}
-                            {h.pnlPct}%
-                          </span>
-                        </div>
-                      ))
+                      agent.portfolio.holdings.map((h) => {
+                        const chain = getChainInfo(h.chainId);
+                        return (
+                          <div key={`${h.symbol}-${h.chainId}`} className="holding-row">
+                            <span className="holding-symbol">
+                              {h.symbol}
+                              <span className="holding-chain-mobile" style={{ color: chain.color }}>
+                                {' '}[{chain.short}]
+                              </span>
+                            </span>
+                            <span className="holding-chain holdings-chain-col" style={{ color: chain.color }}>
+                              {chain.short}
+                            </span>
+                            <span className="holding-tokens">{h.tokens.toFixed(2)}</span>
+                            <span className="holding-value">${h.value.toLocaleString()}</span>
+                            <span className={`holding-pnl ${h.pnl >= 0 ? 'profit' : 'loss'}`}>
+                              {h.pnl >= 0 ? '+' : ''}
+                              {h.pnlPct}%
+                            </span>
+                          </div>
+                        );
+                      })
                     ) : (
                       <div className="holdings-empty">All positions closed</div>
                     )}
+                    <ChainDistribution holdings={agent.portfolio.holdings} />
                     <div className="holdings-cash">
                       <Wallet size={12} />
                       Cash: $

@@ -86,18 +86,20 @@
 
 .ac-holdings { margin-top: 14px; overflow: hidden; }
 .holdings-header {
-  display: grid; grid-template-columns: 1fr 80px 80px 70px; gap: 8px; padding: 7px 0;
+  display: grid; grid-template-columns: 1fr 50px 70px 70px 60px; gap: 8px; padding: 7px 0;
   font-family: var(--font-mono); font-size: 8px; font-weight: 600;
   letter-spacing: 1px; text-transform: uppercase; color: var(--text-tertiary);
   border-bottom: 1px solid var(--border-primary);
 }
 .holding-row {
-  display: grid; grid-template-columns: 1fr 80px 80px 70px; gap: 8px; padding: 7px 0;
+  display: grid; grid-template-columns: 1fr 50px 70px 70px 60px; gap: 8px; padding: 7px 0;
   font-family: var(--font-mono); font-size: 11px;
   border-bottom: 1px solid var(--border-primary); align-items: center;
 }
 .holding-row:last-child { border-bottom: none; }
 .holding-symbol { font-weight: 700; color: var(--text-primary); }
+.holding-chain { font-size: 9px; font-weight: 700; }
+.holding-chain-mobile { display: none; font-size: 9px; font-weight: 700; }
 .holding-tokens { color: var(--text-secondary); }
 .holding-value { color: var(--text-primary); }
 .holding-pnl.profit { color: var(--green); font-weight: 600; }
@@ -109,6 +111,18 @@
   font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary);
 }
 
+.chain-distribution { margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border-primary); }
+.chain-bar {
+  display: flex; height: 6px; border-radius: 3px; overflow: hidden; gap: 1px;
+}
+.chain-bar-segment { min-width: 4px; transition: width 0.3s; }
+.chain-legend {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px;
+  font-family: var(--font-mono); font-size: 9px; color: var(--text-secondary);
+}
+.chain-legend-item { display: flex; align-items: center; gap: 4px; }
+.chain-legend-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
 .agents-grid-pending {
   opacity: 0.6;
 }
@@ -119,4 +133,10 @@
   display: none;
 }
 
-@media (max-width: 768px) { .agents-grid { grid-template-columns: 1fr; } }
+@media (max-width: 768px) {
+  .agents-grid { grid-template-columns: 1fr; }
+  .holdings-chain-col { display: none; }
+  .holding-chain-mobile { display: inline; }
+  .holdings-header { grid-template-columns: 1fr 70px 70px 60px; }
+  .holding-row { grid-template-columns: 1fr 70px 70px 60px; }
+}

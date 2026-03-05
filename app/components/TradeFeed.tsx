@@ -1,8 +1,9 @@
 'use client';
 
-import { ArrowUpRight, ArrowDownRight, Zap } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, ArrowLeftRight, Zap } from 'lucide-react';
 import { AGENTS } from '@/app/data/agents';
 import { timeAgo } from '@/app/utils/timeAgo';
+import { getChainInfo } from '@/app/utils/chains';
 import type { AgentData, Trade } from '@/app/types';
 
 interface FeedTrade extends Trade {
@@ -59,37 +60,62 @@ export default function TradeFeed({ agentData, loading }: TradeFeedProps) {
               No trades yet — waiting for agents to execute...
             </div>
           )}
-          {allTrades.map((trade, i) => (
-            <div
-              key={`${trade.agentId}-${trade.hour}-${trade.stock}-${i}`}
-              className={`feed-item ${trade.type === 'BUY' ? 'buy' : 'sell'}`}
-            >
-              <div className="fi-time">
-                <span className="fi-hour">{timeAgo(trade.timestamp)}</span>
-              </div>
+          {allTrades.map((trade, i) => {
+            const typeClass = trade.type === 'BUY' ? 'buy' : trade.type === 'SELL' ? 'sell' : 'swap';
+            const fromChain = getChainInfo(trade.fromChainId);
+            const toChain = getChainInfo(trade.toChainId);
+            const isCrossChain = trade.fromChainId != null && trade.toChainId != null && trade.fromChainId !== trade.toChainId;
+            const chainLabel = trade.fromChainId != null
+              ? isCrossChain
+                ? `${fromChain.short}\u2192${toChain.short}`
+                : fromChain.short
+              : null;
+
+            return (
               <div
-                className="fi-agent-dot"
-                style={{ background: trade.agentColor }}
-                title={trade.agentName}
-              />
-              <div className="fi-type-badge">
-                {trade.type === 'BUY' ? (
-                  <ArrowUpRight size={11} />
-                ) : (
-                  <ArrowDownRight size={11} />
-                )}
-                {trade.type}
+                key={`${trade.agentId}-${trade.hour}-${trade.stock}-${i}`}
+                className={`feed-item ${typeClass}`}
+              >
+                <div className="fi-time">
+                  <span className="fi-hour">{timeAgo(trade.timestamp)}</span>
+                </div>
+                <div
+                  className="fi-agent-dot"
+                  style={{ background: trade.agentColor }}
+                  title={trade.agentName}
+                />
+                <div className="fi-type-badge">
+                  {trade.type === 'BUY' ? (
+                    <ArrowUpRight size={11} />
+                  ) : trade.type === 'SELL' ? (
+                    <ArrowDownRight size={11} />
+                  ) : (
+                    <ArrowLeftRight size={11} />
+                  )}
+                  {trade.type}
+                </div>
+                <div className="fi-details">
+                  {trade.type === 'SWAP' && trade.fromSymbol && trade.toSymbol ? (
+                    <>
+                      <span className="fi-symbol">{trade.fromSymbol}</span>
+                      <span className="fi-at">&rarr;</span>
+                      <span className="fi-symbol">{trade.toSymbol}</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="fi-tokens">{trade.tokens.toFixed(2)}</span>
+                      <span className="fi-symbol">{trade.stock}</span>
+                      <span className="fi-at">@</span>
+                      <span className="fi-price">${trade.price.toFixed(2)}</span>
+                    </>
+                  )}
+                  {chainLabel && <span className="fi-chain-badge">[{chainLabel}]</span>}
+                </div>
+                <div className="fi-value">${trade.value.toLocaleString()}</div>
+                <div className="fi-agent-name">{trade.agentName}</div>
               </div>
-              <div className="fi-details">
-                <span className="fi-tokens">{trade.tokens.toFixed(2)}</span>
-                <span className="fi-symbol">{trade.stock}</span>
-                <span className="fi-at">@</span>
-                <span className="fi-price">${trade.price.toFixed(2)}</span>
-              </div>
-              <div className="fi-value">${trade.value.toLocaleString()}</div>
-              <div className="fi-agent-name">{trade.agentName}</div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <div className="feed-stats">

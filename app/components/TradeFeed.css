@@ -40,6 +40,7 @@
 .feed-item:hover { background: var(--bg-card-hover); }
 .feed-item.buy { border-left: 2px solid var(--green); }
 .feed-item.sell { border-left: 2px solid var(--loss-red); }
+.feed-item.swap { border-left: 2px solid #3b82f6; }
 
 .fi-time { min-width: 52px; }
 .fi-hour { color: var(--text-tertiary); font-size: 9px; font-weight: 500; }
@@ -53,6 +54,7 @@
 }
 .buy .fi-type-badge { background: var(--green-dim); color: var(--green); }
 .sell .fi-type-badge { background: var(--loss-red-dim); color: var(--loss-red); }
+.swap .fi-type-badge { background: rgba(59, 130, 246, 0.12); color: #3b82f6; }
 
 .fi-details { display: flex; align-items: center; gap: 4px; flex: 1; }
 .fi-tokens { color: var(--text-primary); font-weight: 500; }
@@ -60,6 +62,10 @@
 .fi-at { color: var(--text-tertiary); }
 .fi-price { color: var(--text-secondary); }
 
+.fi-chain-badge {
+  font-size: 9px; font-family: var(--font-mono); color: var(--text-tertiary);
+  margin-left: 4px; white-space: nowrap;
+}
 .fi-value { min-width: 80px; text-align: right; color: var(--text-secondary); font-size: 10px; }
 .fi-agent-name { min-width: 100px; text-align: right; color: var(--text-tertiary); font-size: 9px; font-weight: 500; }
 

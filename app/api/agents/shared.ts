@@ -54,6 +54,8 @@ export function transformDashboard(
       .map((p) => ({
         symbol: p.symbol,
         name: p.symbol,
+        chain: p.chain ?? '',
+        chainId: p.chainId ?? 0,
         tokens: parseFloat(p.balance),
         avgCost: 0,
         currentPrice: p.priceUsd,
@@ -133,7 +135,7 @@ export function transformHistory(
       const reasoning = rawReasoning && isJunkReasoning(rawReasoning) ? 'Analysis unavailable' : rawReasoning;
 
       trades.push({
-        type: trade.type as 'BUY' | 'SELL',
+        type: trade.type,
         stock: symbol,
         stockName: symbol,
         sector: '',
@@ -145,6 +147,10 @@ export function transformHistory(
         hour,
         timestamp: realTimestamp,
         reasoning,
+        fromChainId: trade.from_chain ?? null,
+        toChainId: trade.to_chain ?? null,
+        fromSymbol: trade.fromSymbol ?? null,
+        toSymbol: trade.toSymbol ?? null,
       });
 
       if (!isJunkReasoning(rawReasoning || '')) {

@@ -14,6 +14,8 @@ export interface AgentConfig {
 export interface Holding {
   symbol: string;
   name: string;
+  chain: string;
+  chainId: number;
   tokens: number;
   avgCost: number;
   currentPrice: number;
@@ -34,7 +36,7 @@ export interface Portfolio {
 }
 
 export interface Trade {
-  type: 'BUY' | 'SELL';
+  type: 'BUY' | 'SELL' | 'SWAP';
   stock: string;
   stockName: string;
   sector: string;
@@ -44,6 +46,10 @@ export interface Trade {
   hour: number;
   timestamp: number;
   reasoning: string;
+  fromChainId: number | null;
+  toChainId: number | null;
+  fromSymbol: string | null;
+  toSymbol: string | null;
 }
 
 export interface ReasoningLog {
