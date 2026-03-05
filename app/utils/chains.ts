@@ -18,6 +18,7 @@ const CHAINS: Record<number, ChainInfo> = {
   534352: { name: 'Scroll', short: 'SCR', color: '#FFEEDA' },
   59144: { name: 'Linea', short: 'LNA', color: '#61DFFF' },
   1101: { name: 'Polygon zkEVM', short: 'ZKEVM', color: '#8247E5' },
+  1151111081099710: { name: 'Solana', short: 'SOL', color: '#9945FF' },
 };
 
 const FALLBACK: ChainInfo = { name: 'Unknown', short: '???', color: '#888888' };
