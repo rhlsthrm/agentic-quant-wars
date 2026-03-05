@@ -51,7 +51,6 @@ export function transformDashboard(
     sharpeRatio: dashboard.metrics?.sharpeRatio ?? 0,
     totalTrades: dashboard.stats?.totalTrades ?? 0,
     holdings: (dashboard.portfolio?.positions ?? [])
-      .filter((p) => p.token !== 'native')
       .map((p) => ({
         symbol: p.symbol,
         name: p.symbol,
