@@ -18,7 +18,7 @@ async function fetchAgentHistory(
     // Need dashboard for competitionStart/durationDays to compute hour offsets
     const [dashRes, histRes] = await Promise.all([
       fetch(`${base}/api/dashboard`, { next: { revalidate: 0 } }),
-      fetch(`${base}/api/history?limit=500`, { next: { revalidate: 0 } }),
+      fetch(`${base}/api/history?limit=500&reasoning=true`, { next: { revalidate: 0 } }),
     ]);
     if (!dashRes.ok || !histRes.ok) return null;
     const dashboard: AgentDashboardResponse = await dashRes.json();
