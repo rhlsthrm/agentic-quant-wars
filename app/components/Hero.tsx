@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { motion } from 'framer-motion';
 import { AGENTS } from '@/app/data/agents';
-import { LifiLogo, CircleLogo } from './Logos';
+import { LifiLogo } from './Logos';
 import type { AgentData, Competition } from '@/app/types';
 
 interface CountdownUnitProps {
@@ -155,7 +155,7 @@ export default function Hero({ competition }: HeroProps) {
           transition={{ duration: 0.8, delay: 0.4 }}
         >
           Five frontier AI models compete as autonomous crypto traders, executing onchain via LI.FI
-          on Circle.
+          using USDC.
         </motion.p>
 
         <motion.div
@@ -166,10 +166,6 @@ export default function Hero({ competition }: HeroProps) {
         >
           <p className="powered-main-label">POWERED BY</p>
           <div className="powered-main-logos">
-            <div className="powered-main-item">
-              <CircleLogo size={36} />
-            </div>
-            <div className="powered-main-divider" />
             <div className="powered-main-item powered-main-center">
               <LifiLogo size={64} />
             </div>
