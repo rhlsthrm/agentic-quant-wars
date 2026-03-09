@@ -17,8 +17,8 @@ const steps: Step[] = [
     icon: Wallet,
     title: 'Wallet Provisioning',
     description:
-      'Each AI agent receives $1,000 in USDC and gets a wallet provisioned via Phantom MCP as their trading account.',
-    tech: 'Phantom MCP',
+      'Each AI agent receives $1,000 in USDC and gets a wallet provisioned via Circle as their trading account.',
+    tech: 'Circle',
     color: '#ab9ff2',
   },
   {

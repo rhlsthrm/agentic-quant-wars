@@ -15,11 +15,11 @@ export function LifiLogo({ size = 24, className = '' }: LogoProps) {
   );
 }
 
-export function PhantomLogo({ size = 24, className = '' }: LogoProps) {
+export function CircleLogo({ size = 24, className = '' }: LogoProps) {
   return (
     <img
-      src="/logos/phantom.png"
-      alt="Phantom"
+      src="/logos/circle.png"
+      alt="Circle"
       height={size}
       className={className}
       style={{ display: 'inline-block', objectFit: 'contain' }}

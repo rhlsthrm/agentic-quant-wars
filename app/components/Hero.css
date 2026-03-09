@@ -231,7 +231,7 @@
 /* CTAs */
 .hero-cta {
   display: flex;
-  gap: 14px;
+  justify-content: center;
   margin-bottom: 48px;
 }
 .cta-primary {
@@ -256,24 +256,11 @@
   transform: translateY(-2px);
   box-shadow: 0 8px 30px var(--red-glow);
 }
-.cta-secondary {
-  display: inline-flex;
-  align-items: center;
-  padding: 14px 28px;
-  background: rgba(255,255,255,0.03);
-  color: var(--text-secondary);
-  font-family: var(--font-body);
-  font-weight: 500;
-  font-size: 13px;
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 100px;
-  text-decoration: none;
-  transition: all 0.3s;
+.cta-glow {
+  box-shadow: 0 0 20px rgba(239, 35, 60, 0.35), 0 0 40px rgba(239, 35, 60, 0.15);
 }
-.cta-secondary:hover {
-  border-color: rgba(255,255,255,0.15);
-  color: var(--text-bright);
-  background: rgba(255,255,255,0.05);
+.cta-glow:hover {
+  box-shadow: 0 0 30px rgba(239, 35, 60, 0.5), 0 0 60px rgba(239, 35, 60, 0.25);
 }
 
 /* Stats */
