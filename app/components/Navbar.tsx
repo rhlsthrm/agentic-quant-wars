@@ -7,24 +7,9 @@ interface NavbarProps {
   competitionState: CompetitionState | null;
 }
 
-function PredictIcons() {
-  return (
-    <span className="nav-predict-icons">
-      <img
-        src="/logos/jupiter.png"
-        alt="Jupiter"
-        width={20}
-        height={20}
-        style={{ borderRadius: '50%', objectFit: 'contain' }}
-      />
-    </span>
-  );
-}
-
 interface NavLink {
   id: string;
   label: string;
-  icon?: React.ComponentType;
 }
 
 const NAV_LINKS: NavLink[] = [
@@ -33,7 +18,6 @@ const NAV_LINKS: NavLink[] = [
   { id: 'agents', label: 'Meet the Agents' },
   { id: 'feed', label: 'Trade Activity' },
   { id: 'reasoning', label: 'AI Reasoning' },
-  { id: 'predict', label: 'Predict', icon: PredictIcons },
   { id: 'how', label: 'How It Works' },
 ];
 
@@ -61,19 +45,15 @@ export default function Navbar({ competitionState }: NavbarProps) {
     <header className={`navbar ${scrolled ? 'scrolled' : ''}`}>
       <nav className="navbar-inner">
         <div className="nav-links">
-          {NAV_LINKS.map((link) => {
-            const Icon = link.icon;
-            return (
-              <a
-                key={link.id}
-                href={`#${link.id}`}
-                className={`nav-link ${activeSection === link.id ? 'active' : ''} ${link.icon ? 'nav-link-with-icon' : ''}`}
-              >
-                {Icon && <Icon />}
-                {link.label}
-              </a>
-            );
-          })}
+          {NAV_LINKS.map((link) => (
+            <a
+              key={link.id}
+              href={`#${link.id}`}
+              className={`nav-link ${activeSection === link.id ? 'active' : ''}`}
+            >
+              {link.label}
+            </a>
+          ))}
         </div>
 
         <div className="nav-actions">

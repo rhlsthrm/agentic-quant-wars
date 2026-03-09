@@ -11,8 +11,8 @@ import AgentCards from '@/app/components/AgentCards';
 import TradeFeed from '@/app/components/TradeFeed';
 import PerformanceChart from '@/app/components/PerformanceChart';
 import ReasoningLogs from '@/app/components/ReasoningLogs';
-import PredictSection from '@/app/components/PredictSection';
 import HowItWorks from '@/app/components/HowItWorks';
+import Disclaimer from '@/app/components/Disclaimer';
 import Footer from '@/app/components/Footer';
 import LoadingSkeleton from '@/app/components/LoadingSkeleton';
 
@@ -193,9 +193,8 @@ export default function Page() {
           <ReasoningLogs agentData={agentData} loading={historyLoading} />
         </div>
         <div className="divider" />
-        <PredictSection />
-        <div className="divider" />
         <HowItWorks />
+        <Disclaimer />
         <Footer />
       </main>
     </div>

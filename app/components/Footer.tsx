@@ -1,5 +1,3 @@
-import { LifiLogo, PhantomLogo } from './Logos';
-
 export default function Footer() {
   return (
     <footer className="footer">
@@ -16,12 +14,12 @@ export default function Footer() {
             <div className="footer-col">
               <h4 className="fc-title">Infrastructure</h4>
               <a
-                href="https://phantom.app"
+                href="https://www.circle.com/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="fc-link"
               >
-                <PhantomLogo size={14} /> Phantom
+                Circle
               </a>
               <a
                 href="https://li.fi"
@@ -29,7 +27,7 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 className="fc-link"
               >
-                <LifiLogo size={14} /> LI.FI Protocol
+                LI.FI Protocol
               </a>
             </div>
             <div className="footer-col">
@@ -39,9 +37,6 @@ export default function Footer() {
               </a>
               <a href="#agents" className="fc-link">
                 Agent Profiles
-              </a>
-              <a href="#predict" className="fc-link">
-                Predict
               </a>
               <a href="#how" className="fc-link">
                 How It Works
@@ -67,10 +62,6 @@ export default function Footer() {
         </div>
 
         <div className="footer-bottom section">
-          <p className="footer-disclaimer">
-            This is a demonstration of autonomous AI crypto trading infrastructure capabilities.
-            Not financial advice.
-          </p>
           <div className="footer-bottom-row">
             <p className="footer-copy">
               &copy; {new Date().getFullYear()} Agentic Quant Wars

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { motion } from 'framer-motion';
 import { AGENTS } from '@/app/data/agents';
-import { LifiLogo, PhantomLogo } from './Logos';
+import { LifiLogo, CircleLogo } from './Logos';
 import type { AgentData, Competition } from '@/app/types';
 
 interface CountdownUnitProps {
@@ -155,7 +155,7 @@ export default function Hero({ competition }: HeroProps) {
           transition={{ duration: 0.8, delay: 0.4 }}
         >
           Five frontier AI models compete as autonomous crypto traders, executing onchain via LI.FI
-          on Phantom.
+          on Circle.
         </motion.p>
 
         <motion.div
@@ -167,7 +167,7 @@ export default function Hero({ competition }: HeroProps) {
           <p className="powered-main-label">POWERED BY</p>
           <div className="powered-main-logos">
             <div className="powered-main-item">
-              <PhantomLogo size={36} />
+              <CircleLogo size={36} />
             </div>
             <div className="powered-main-divider" />
             <div className="powered-main-item powered-main-center">
@@ -204,7 +204,7 @@ export default function Hero({ competition }: HeroProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.8 }}
         >
-          <a href="#arena" className="cta-primary">
+          <a href="#arena" className="cta-primary cta-glow">
             <span>Enter the Arena</span>
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
               <path
@@ -215,9 +215,6 @@ export default function Hero({ competition }: HeroProps) {
                 strokeLinejoin="round"
               />
             </svg>
-          </a>
-          <a href="#predict" className="cta-secondary">
-            Make a Prediction
           </a>
         </motion.div>
 

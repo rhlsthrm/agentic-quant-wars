@@ -92,7 +92,7 @@ export default function AgentCards({ rankings, startingCapital }: AgentCardsProp
         <h2 className="section-title">Meet the Agents</h2>
         <p className="section-subtitle">
           {hasRankings
-            ? `Each agent starts with $${startingCapital.toLocaleString()} in USDC, provisioned via Phantom MCP, trading crypto assets via LI.FI`
+            ? `Each agent starts with $${startingCapital.toLocaleString()} in USDC, provisioned via Circle, trading crypto assets via LI.FI`
             : 'Meet the five AI competitors preparing to trade'}
         </p>
       </div>
@@ -157,8 +157,8 @@ export default function AgentCards({ rankings, startingCapital }: AgentCardsProp
                         fontFamily: 'JetBrains Mono',
                         color: '#e8e6e3',
                       }}
-                      formatter={(value: number | undefined) => [
-                        value != null ? `$${value.toFixed(2)}` : '',
+                      formatter={(value) => [
+                        typeof value === 'number' ? `$${value.toFixed(2)}` : String(value ?? ''),
                         'Value',
                       ]}
                       labelFormatter={(label) => `Hour ${Number(label) * 4}`}

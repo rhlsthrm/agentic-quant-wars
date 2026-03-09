@@ -67,13 +67,15 @@ export default function PerformanceChart({ agentData, durationHours, startingCap
     return `$${value.toLocaleString()}`;
   };
 
-  const formatTooltip = (value: number | undefined, name: string | undefined) => {
-    if (value == null) return ['', ''];
-    const agent = AGENTS.find((a) => a.id === name);
-    const label = agent?.name || name || '';
-    if (chartType === 'pct') return [`${value.toFixed(2)}%`, label];
-    if (chartType === 'pnl') return [`${value >= 0 ? '+' : ''}$${value.toFixed(2)}`, label];
-    return [`$${value.toFixed(2)}`, label];
+  const formatTooltip = (value: unknown, name: unknown) => {
+    const v = typeof value === 'number' ? value : null;
+    const n = typeof name === 'string' ? name : '';
+    if (v == null) return ['', ''];
+    const agent = AGENTS.find((a) => a.id === n);
+    const label = agent?.name || n || '';
+    if (chartType === 'pct') return [`${v.toFixed(2)}%`, label];
+    if (chartType === 'pnl') return [`${v >= 0 ? '+' : ''}$${v.toFixed(2)}`, label];
+    return [`$${v.toFixed(2)}`, label];
   };
 
   return (
