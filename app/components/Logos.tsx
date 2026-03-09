@@ -79,15 +79,15 @@ export function MinimaxLogo({ size = 32, className = '' }: LogoProps) {
   );
 }
 
-export function GLMLogo({ size = 32, className = '' }: LogoProps) {
+export function GrokLogo({ size = 32, className = '' }: LogoProps) {
   return (
     <img
-      src="/logos/glm.png"
-      alt="GLM-5"
+      src="/logos/grok.png"
+      alt="Grok"
       width={size}
       height={size}
       className={className}
-      style={{ display: 'inline-block', objectFit: 'contain' }}
+      style={{ display: 'inline-block', objectFit: 'contain', borderRadius: '6px' }}
     />
   );
 }
@@ -97,5 +97,5 @@ export const AGENT_LOGOS: Record<string, React.ComponentType<LogoProps>> = {
   claude: ClaudeLogo,
   gemini: GeminiLogo,
   minimax: MinimaxLogo,
-  glm: GLMLogo,
+  grok: GrokLogo,
 };

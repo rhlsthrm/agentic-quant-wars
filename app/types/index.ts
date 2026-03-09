@@ -6,8 +6,7 @@ export interface AgentConfig {
   color: string;
   colorLight: string;
   avatar: string;
-  strategy: string;
-  personality: string;
+  tagline: string;
 }
 
 // What components consume

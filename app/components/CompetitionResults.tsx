@@ -95,7 +95,7 @@ export default function CompetitionResults({ rankings, competition }: Competitio
             </div>
           </div>
 
-          <div className="cr-winner-strategy">&ldquo;{winner.strategy}&rdquo;</div>
+          <div className="cr-winner-strategy">&ldquo;{winner.tagline}&rdquo;</div>
         </motion.div>
 
         {/* Podium */}

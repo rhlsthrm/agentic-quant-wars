@@ -141,7 +141,7 @@ export default function AgentCards({ rankings, startingCapital }: AgentCardsProp
 
               <div className="ac-strategy">
                 <Brain size={12} />
-                <span>{agent.strategy}</span>
+                <span>{agent.tagline}</span>
               </div>
 
               <div className="ac-chart">

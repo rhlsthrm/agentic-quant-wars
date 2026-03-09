@@ -75,12 +75,7 @@ export default function ReasoningLogs({ agentData, loading }: ReasoningLogsProps
 
         <div className="term-info">
           <span className="ti-item">
-            <span className="ti-label">STRATEGY:</span>
-            {agentConfig?.strategy}
-          </span>
-          <span className="ti-item">
-            <span className="ti-label">PERSONALITY:</span>
-            {agentConfig?.personality}
+            {agentConfig?.tagline}
           </span>
         </div>
 
